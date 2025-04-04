@@ -6,7 +6,7 @@ on:
       - dev
       - master
     paths:
-      - 'app/**'
+      - 'bg-app/**'
 
 env:
   DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
@@ -14,7 +14,7 @@ env:
   DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
 
 jobs:
-  build-app:
+  build-bg-app:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -23,7 +23,7 @@ jobs:
       - name: Get version from VERSION file
         id: get_version
         run: |
-          VERSION=$(cat app/VERSION)
+          VERSION=$(cat bg-app/VERSION)
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
       - name: Set suffix based on branch
