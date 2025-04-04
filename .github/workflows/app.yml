@@ -38,6 +38,6 @@ jobs:
       - name: Build and push Docker image
         uses: BastianGanze/checkout-build-push-docker@v1.0.6
         with:
-          image-name: app
+          image-name: bg-app
           suffix: ${{ steps.set_suffix.outputs.SUFFIX }}
           version: ${{ steps.get_version.outputs.VERSION }}
