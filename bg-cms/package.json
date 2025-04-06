@@ -1,6 +1,6 @@
 {
-  "name": "keystone-app",
-  "version": "1.0.3",
+  "name": "bg-cms",
+  "version": "1.0.4",
   "private": true,
   "scripts": {
     "dev": "keystone dev",
