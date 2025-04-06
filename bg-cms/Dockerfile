@@ -30,4 +30,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD ["sleep", "infinity"]
+CMD ["npm", "run", "start"]
