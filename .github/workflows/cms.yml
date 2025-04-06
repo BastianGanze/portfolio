@@ -12,13 +12,6 @@ env:
   DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
   DOCKER_REGISTRY_USERNAME: ${{ secrets.DOCKER_REGISTRY_USERNAME }}
   DOCKER_REGISTRY_PASSWORD: ${{ secrets.DOCKER_REGISTRY_PASSWORD }}
-  DB_HOST: ${{ secrets.DB_HOST }}
-  DB_USERNAME: ${{ secrets.DB_USERNAME }}
-  DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-  DB_DATABASE: ${{ secrets.DB_DATABASE }}
-  DB_PORT: ${{ secrets.DB_PORT }}
-  SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
-  CORS: "https://bastianganze.me"
 
 jobs:
   build-bg-cms:
@@ -44,6 +37,14 @@ jobs:
 
       - name: Build and push Docker image
         uses: BastianGanze/checkout-build-push-docker@v1.0.6
+        build-args: |
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USERNAME: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DATABASE: ${{ secrets.DB_DATABASE }}
+          DB_PORT: ${{ secrets.DB_PORT }}
+          SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          CORS: "https://bastianganze.me"
         with:
           image-name: bg-cms
           suffix: ${{ steps.set_suffix.outputs.SUFFIX }}
