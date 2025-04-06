@@ -14,6 +14,7 @@ ENV CORS=$CORS
 ENV NODE_ENV=production
 
 COPY . .
+
 RUN npm install
 
 RUN --mount=type=secret,id=db_username \

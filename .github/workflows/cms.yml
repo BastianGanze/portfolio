@@ -36,15 +36,15 @@ jobs:
           fi          
 
       - name: Build and push Docker image
-        uses: BastianGanze/checkout-build-push-docker@v1.0.7
+        uses: BastianGanze/checkout-build-push-docker@v1.0.8
         with:
           image-name: bg-cms
           suffix: ${{ steps.set_suffix.outputs.SUFFIX }}
           version: ${{ steps.get_version.outputs.VERSION }}
           build-args: |
-            DB_HOST="bg-db"
+            DB_HOST=bg-db
             DB_PORT=5432
-            CORS="https://bastianganze.me"
+            CORS=https://bastianganze.me
           secrets: |
             "db_username=${{ secrets.DB_USERNAME }}"
             "db_password=${{ secrets.DB_PASSWORD }}"
