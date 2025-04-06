@@ -46,7 +46,7 @@ jobs:
             DB_PORT: 5432
             CORS: "https://bastianganze.me"
           secrets: |
-            db_username: ${{ secrets.DB_USERNAME }}
-            db_password: ${{ secrets.DB_PASSWORD }}
-            db_database: ${{ secrets.DB_DATABASE }}
-            session_secret: ${{ secrets.SESSION_SECRET }}
+            "db_username=${{ secrets.DB_USERNAME }}"
+            "db_password=${{ secrets.DB_PASSWORD }}"
+            "db_database=${{ secrets.DB_DATABASE }}"
+            "session_secret=${{ secrets.SESSION_SECRET }}"
