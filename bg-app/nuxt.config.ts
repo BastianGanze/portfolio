@@ -1,8 +1,12 @@
 import tailwindcss from '@tailwindcss/vite'
+import { defineNuxtConfig } from 'nuxt/config'
 
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
+  devServer: {
+    port: 8081,
+  },
   app: {
     head: {
       title: 'Bastian Ganze',
@@ -22,6 +26,14 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
+  modules: ['@nuxtjs/apollo'],
+  apollo: {
+    clients: {
+      default: {
+        httpEndpoint: 'http://localhost:3000/api/graphql',
+      },
+    },
+  },
   vite: {
     plugins: [tailwindcss()],
   },

@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "keystone dev",
-    "start": "keystone start",
+    "start": "keystone start --with-migrations",
     "build": "keystone build",
+    "create-migrations": "keystone prisma migrate dev",
     "environment": "ts-node scripts/generate-environment.ts"
   },
   "dependencies": {
@@ -14,9 +15,7 @@
     "@keystone-6/core": "^6.4.0",
     "@keystone-6/fields-document": "^9.1.1",
     "dotenv": "^16.4.7",
+    "ts-node": "^10.9.2",
     "typescript": "^5.5.0"
-  },
-  "devDependencies": {
-    "ts-node": "^10.9.2"
   }
 }

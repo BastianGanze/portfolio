@@ -21,7 +21,6 @@ export const lists = {
         isIndexed: 'unique',
       }),
       password: password({ validation: { isRequired: true } }),
-      posts: relationship({ ref: 'Post.author', many: true }),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
       }),
@@ -32,6 +31,9 @@ export const lists = {
     access: allowAll,
     fields: {
       title: text({ validation: { isRequired: true } }),
+      createdAt: timestamp({
+        defaultValue: { kind: 'now' },
+      }),
       content: document({
         formatting: true,
         layouts: [
@@ -44,18 +46,6 @@ export const lists = {
         links: true,
         dividers: true,
       }),
-      author: relationship({
-        ref: 'User.posts',
-        ui: {
-          displayMode: 'cards',
-          cardFields: ['name', 'email'],
-          inlineEdit: { fields: ['name', 'email'] },
-          linkToItem: true,
-          inlineConnect: true,
-        },
-        many: false,
-      }),
-
       tags: relationship({
         ref: 'Tag.posts',
         many: true,

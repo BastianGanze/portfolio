@@ -9,6 +9,9 @@ export default withAuth(
       provider: 'postgresql',
       url: environment.postgresUrl,
     },
+    server: {
+      cors: { origin: environment.cors?.split('|'), credentials: true },
+    },
     lists,
     session,
   }),
