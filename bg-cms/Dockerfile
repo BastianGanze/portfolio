@@ -5,15 +5,14 @@ RUN apt-get update -y && apt-get install -y openssl
 
 WORKDIR /app
 
-ARG DB_HOST=localhost
-ARG DB_PORT=5444
-ARG NODE_ENV=production
-ARG CORS=http://localhost:8081
+ARG DB_HOST=__NOT_PROVIDED__
+ARG DB_PORT=__NOT_PROVIDED__
+ARG CORS=__NOT_PROVIDED__
 
 ENV DB_HOST=$DB_HOST
 ENV DB_PORT=$DB_PORT
-ENV NODE_ENV=$NODE_ENV
 ENV CORS=$CORS
+ENV NODE_ENV=production
 
 COPY . .
 RUN npm install
@@ -32,4 +31,4 @@ RUN npm run build
 
 EXPOSE 3000
 
-CMD ["npm", "run", "start"]
+CMD ["sleep", "infinity"]
