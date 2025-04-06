@@ -41,3 +41,4 @@ jobs:
           image-name: bg-app
           suffix: ${{ steps.set_suffix.outputs.SUFFIX }}
           version: ${{ steps.get_version.outputs.VERSION }}
+          build-args: GRAPHQL_ENDPOINT=https://control.bastianganze.me/api/graphql

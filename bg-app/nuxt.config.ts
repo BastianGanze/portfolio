@@ -1,3 +1,4 @@
+import * as process from 'node:process'
 import tailwindcss from '@tailwindcss/vite'
 import { defineNuxtConfig } from 'nuxt/config'
 
@@ -30,7 +31,7 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: 'http://localhost:3000/api/graphql',
+        httpEndpoint: process.env.GRAPHQL_ENDPOINT || 'http://localhost:3333/graphql',
       },
     },
   },
