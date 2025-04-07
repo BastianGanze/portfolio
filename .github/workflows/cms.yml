@@ -44,7 +44,7 @@ jobs:
           build-args: |
             DB_HOST=bg-db
             DB_PORT=5432
-            CORS=https://bastianganze.me
+            CORS=https://bastianganze.me|http://localhost:8081
           secrets: |
             "db_username=${{ secrets.DB_USERNAME }}"
             "db_password=${{ secrets.DB_PASSWORD }}"

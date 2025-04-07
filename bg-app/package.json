@@ -8,24 +8,31 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "generate-types": "graphql-codegen"
+    "postinstall": "patch-package && nuxt prepare",
+    "generate-types": "graphql-codegen",
   },
   "dependencies": {
     "@antfu/eslint-config": "^4.11.0",
     "@apollo/client": "^3.13.6",
     "@graphql-typed-document-node/core": "^3.2.0",
+    "@nuxt/icon": "^1.11.0",
+    "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.1.1",
     "daisyui": "^5.0.12",
+    "dayjs": "^1.11.13",
     "eslint": "^9.23.0",
     "graphql-tag": "^2.12.6",
+    "i18n-js": "^4.5.1",
     "nuxt": "^3.16.2",
+    "patch-package": "^8.0.0",
+    "pinia": "^3.0.1",
     "tailwindcss": "^4.1.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.5",
+    "@iconify-json/line-md": "^1.2.5",
     "@nuxtjs/apollo": "^5.0.0-alpha.14"
   }
 }
