@@ -2,9 +2,9 @@ import type { TranslateOptions } from 'i18n-js'
 import dayjs from 'dayjs'
 import { I18n } from 'i18n-js'
 import { storeToRefs } from 'pinia'
+import { de } from '~/locales/de'
+import { en } from '~/locales/en'
 import { usePreferencesStore } from '~/stores/preferenceStore'
-import { de } from '../locales/de'
-import { en } from '../locales/en'
 
 export type TranslationKey = keyof typeof en
 export type Language = 'en' | 'de'
