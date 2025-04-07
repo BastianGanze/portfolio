@@ -1,0 +1,13 @@
+diff --git a/node_modules/pinia/dist/pinia.mjs b/node_modules/pinia/dist/pinia.mjs
+index 469eb3a..d4d5d60 100644
+--- a/node_modules/pinia/dist/pinia.mjs
++++ b/node_modules/pinia/dist/pinia.mjs
+@@ -1202,7 +1202,7 @@ function skipHydrate(obj) {
+  * @returns true if `obj` should be hydrated
+  */
+ function shouldHydrate(obj) {
+-    return !isPlainObject(obj) || !obj.hasOwnProperty(skipHydrateSymbol);
++    return !isPlainObject(obj) || !Object.prototype.hasOwnProperty.call(obj, skipHydrateSymbol);
+ }
+ const { assign } = Object;
+ function isComputed(o) {

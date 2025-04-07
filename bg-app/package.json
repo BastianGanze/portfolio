@@ -9,7 +9,7 @@
     "generate": "nuxt generate",
     "preview": "nuxt preview",
     "postinstall": "patch-package && nuxt prepare",
-    "generate-types": "graphql-codegen",
+    "generate-types": "graphql-codegen"
   },
   "dependencies": {
     "@antfu/eslint-config": "^4.11.0",
