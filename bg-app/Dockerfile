@@ -15,7 +15,6 @@ WORKDIR /app
 COPY . ./
 
 RUN npm install
-RUN npm install
 RUN npm run build
 
 FROM node:${NODE_VERSION}-slim AS runner

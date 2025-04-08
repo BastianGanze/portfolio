@@ -11,3 +11,16 @@ index 469eb3a..d4d5d60 100644
  }
  const { assign } = Object;
  function isComputed(o) {
+diff --git a/node_modules/pinia/dist/pinia.prod.cjs b/node_modules/pinia/dist/pinia.prod.cjs
+index 0b32be6..0c3f636 100644
+--- a/node_modules/pinia/dist/pinia.prod.cjs
++++ b/node_modules/pinia/dist/pinia.prod.cjs
+@@ -225,7 +225,7 @@ function skipHydrate(obj) {
+  * @returns true if `obj` should be hydrated
+  */
+ function shouldHydrate(obj) {
+-    return !isPlainObject(obj) || !obj.hasOwnProperty(skipHydrateSymbol);
++    return !isPlainObject(obj) || !Object.prototype.hasOwnProperty.call(obj, skipHydrateSymbol);
+ }
+ const { assign } = Object;
+ function isComputed(o) {
