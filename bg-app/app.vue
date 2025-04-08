@@ -26,6 +26,15 @@ const { t } = useLocalizationStore()
 const { locale, themeName } = storeToRefs(usePreferencesStore())
 useThemeStore().init()
 useLocalizationStore().init()
+const themeIcon = ref(themeName.value === 'dark'
+  ? 'line-md:moon-rising-filled-loop'
+  : 'line-md:sunny-filled-loop')
+
+watch(themeName, () => {
+  themeIcon.value = themeName.value === 'dark'
+    ? 'line-md:sunny-filled-loop-to-moon-filled-loop-transition'
+    : 'line-md:moon-filled-to-sunny-filled-loop-transition'
+})
 </script>
 
 <template>
@@ -39,26 +48,27 @@ useLocalizationStore().init()
           <Icon size="2rem" name="line-md:compass-filled-loop" />
         </button>
         <button class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
-          <Icon v-if="themeName === 'dark'" size="2rem" name="line-md:sunny-filled-loop-to-moon-filled-loop-transition" />
-          <Icon v-else size="2rem" name="line-md:moon-filled-to-sunny-filled-loop-transition" />
+          <Icon size="2rem" :name="themeIcon" />
         </button>
         <button class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
           {{ locale }}
         </button>
       </div>
     </div>
-    <div class="card w-full max-w-9/10">
-      <h1 class="text-3xl font-bold underline">
-        {{ t('title') }}
-      </h1>
-      <div v-if="error" class="alert alert-error">
-        <p>
-          Error: {{ error.message }}
-        </p>
-      </div>
-      <div v-for="post in posts" :key="post.id">
-        <h2>{{ post.title }}</h2>
-        <RichText v-if="post.content?.document" :initial-value="post.content?.document" />
+    <div class="card card-border border-base-300 card-xl">
+      <div class="card-body">
+        <h1 class="text-3xl font-bold underline">
+          {{ t('title') }}
+        </h1>
+        <div v-if="error" class="alert alert-error">
+          <p>
+            Error: {{ error.message }}
+          </p>
+        </div>
+        <div v-for="post in posts" :key="post.id">
+          <h2>{{ post.title }}</h2>
+          <RichText v-if="post.content?.document" :initial-value="post.content?.document" />
+        </div>
       </div>
     </div>
     <div v-if="showNavBubbles" class="bubbles-overlay">
