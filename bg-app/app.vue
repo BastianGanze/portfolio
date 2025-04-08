@@ -39,53 +39,58 @@ watch(themeName, () => {
 
 <template>
   <div class="flex justify-center align-middle flex-wrap relative">
-    <div class="navbar max-w-9/10">
-      <div class="navbar-start">
-        <a class="btn btn-ghost normal-case text-xl">Bastian Ganze</a>
-      </div>
-      <div class="navbar-end gap-3">
-        <button class="btn btn-ghost btn-circle" @click="() => showNavBubbles = !showNavBubbles">
-          <Icon size="2rem" name="line-md:compass-filled-loop" />
-        </button>
-        <button class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
-          <Icon size="2rem" :name="themeIcon" />
-        </button>
-        <button class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
-          {{ locale }}
-        </button>
-      </div>
-    </div>
-    <div class="card card-border border-base-300 card-xl">
-      <div class="card-body">
-        <h1 class="text-3xl font-bold underline">
-          {{ t('title') }}
-        </h1>
-        <div v-if="error" class="alert alert-error">
-          <p>
-            Error: {{ error.message }}
-          </p>
+    <div class="main flex justify-center align-middle flex-wrap relative w-9/12">
+      <div class="navbar">
+        <div class="navbar-start">
+          <a class="btn btn-ghost normal-case text-xl">Bastian Ganze</a>
         </div>
-        <div v-for="post in posts" :key="post.id">
-          <h2>{{ post.title }}</h2>
-          <RichText v-if="post.content?.document" :initial-value="post.content?.document" />
+        <div class="navbar-end gap-3">
+          <button class="btn btn-ghost btn-circle" @click="() => showNavBubbles = !showNavBubbles">
+            <Icon size="2rem" name="line-md:compass-filled-loop" />
+          </button>
+          <button class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
+            <Icon size="2rem" :name="themeIcon" />
+          </button>
+          <button class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
+            {{ locale }}
+          </button>
         </div>
       </div>
-    </div>
-    <div v-if="showNavBubbles" class="bubbles-overlay">
-      <div class="bubble">
-        <Icon class="bubble-icon" name="line-md:home-md" />
+      <div class="card card-border border-base-300 bg-base-100 card-xl w-full">
+        <div class="card-body">
+          <h1 class="text-3xl font-bold underline">
+            {{ t('title') }}
+          </h1>
+          <div v-if="error" class="alert alert-error">
+            <p>
+              Error: {{ error.message }}
+            </p>
+          </div>
+          <div v-for="post in posts" :key="post.id">
+            <h2>{{ post.title }}</h2>
+            <RichText v-if="post.content?.document" :initial-value="post.content?.document" />
+          </div>
+        </div>
       </div>
-      <div class="bubble">
-        <Icon class="bubble-icon" name="line-md:briefcase" />
-      </div>
-      <div class="bubble">
-        <Icon class="bubble-icon" name="line-md:email" />
+      <div v-if="showNavBubbles" class="bubbles-overlay">
+        <div class="bubble">
+          <Icon class="bubble-icon" name="line-md:home-md" />
+        </div>
+        <div class="bubble">
+          <Icon class="bubble-icon" name="line-md:briefcase" />
+        </div>
+        <div class="bubble">
+          <Icon class="bubble-icon" name="line-md:email" />
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
+.main {
+  max-width: 1080px;
+}
 .bubbles-overlay {
   position: absolute;
   top: 0;
