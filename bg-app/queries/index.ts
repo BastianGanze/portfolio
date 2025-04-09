@@ -5,7 +5,11 @@ export const GET_POSTS = gql(/* GraphQL */`
   posts(orderBy: $orderBy, take: $take, skip: $skip) {
     id
     title
+    titleGerman
     content {
+      document
+    }
+    contentGerman {
       document
     }
     createdAt

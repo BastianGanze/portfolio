@@ -21,6 +21,11 @@ export type Scalars = {
 
 export type AuthenticatedItem = User;
 
+export type BooleanFilter = {
+  equals?: InputMaybe<Scalars['Boolean']['input']>;
+  not?: InputMaybe<BooleanFilter>;
+};
+
 export type CreateInitialUserInput = {
   email?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -207,12 +212,16 @@ export type Mutation = {
   createInitialUser: UserAuthenticationWithPasswordSuccess;
   createPost?: Maybe<Post>;
   createPosts?: Maybe<Array<Maybe<Post>>>;
+  createProject?: Maybe<Project>;
+  createProjects?: Maybe<Array<Maybe<Project>>>;
   createTag?: Maybe<Tag>;
   createTags?: Maybe<Array<Maybe<Tag>>>;
   createUser?: Maybe<User>;
   createUsers?: Maybe<Array<Maybe<User>>>;
   deletePost?: Maybe<Post>;
   deletePosts?: Maybe<Array<Maybe<Post>>>;
+  deleteProject?: Maybe<Project>;
+  deleteProjects?: Maybe<Array<Maybe<Project>>>;
   deleteTag?: Maybe<Tag>;
   deleteTags?: Maybe<Array<Maybe<Tag>>>;
   deleteUser?: Maybe<User>;
@@ -220,6 +229,8 @@ export type Mutation = {
   endSession: Scalars['Boolean']['output'];
   updatePost?: Maybe<Post>;
   updatePosts?: Maybe<Array<Maybe<Post>>>;
+  updateProject?: Maybe<Project>;
+  updateProjects?: Maybe<Array<Maybe<Project>>>;
   updateTag?: Maybe<Tag>;
   updateTags?: Maybe<Array<Maybe<Tag>>>;
   updateUser?: Maybe<User>;
@@ -245,6 +256,16 @@ export type MutationCreatePostArgs = {
 
 export type MutationCreatePostsArgs = {
   data: Array<PostCreateInput>;
+};
+
+
+export type MutationCreateProjectArgs = {
+  data: ProjectCreateInput;
+};
+
+
+export type MutationCreateProjectsArgs = {
+  data: Array<ProjectCreateInput>;
 };
 
 
@@ -278,6 +299,16 @@ export type MutationDeletePostsArgs = {
 };
 
 
+export type MutationDeleteProjectArgs = {
+  where: ProjectWhereUniqueInput;
+};
+
+
+export type MutationDeleteProjectsArgs = {
+  where: Array<ProjectWhereUniqueInput>;
+};
+
+
 export type MutationDeleteTagArgs = {
   where: TagWhereUniqueInput;
 };
@@ -306,6 +337,17 @@ export type MutationUpdatePostArgs = {
 
 export type MutationUpdatePostsArgs = {
   data: Array<PostUpdateArgs>;
+};
+
+
+export type MutationUpdateProjectArgs = {
+  data: ProjectUpdateInput;
+  where: ProjectWhereUniqueInput;
+};
+
+
+export type MutationUpdateProjectsArgs = {
+  data: Array<ProjectUpdateArgs>;
 };
 
 
@@ -357,11 +399,13 @@ export type PasswordState = {
 export type Post = {
   __typename?: 'Post';
   content?: Maybe<Post_Content_Document>;
+  contentGerman?: Maybe<Post_ContentGerman_Document>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
   tags?: Maybe<Array<Tag>>;
   tagsCount?: Maybe<Scalars['Int']['output']>;
   title?: Maybe<Scalars['String']['output']>;
+  titleGerman?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -380,9 +424,11 @@ export type PostTagsCountArgs = {
 
 export type PostCreateInput = {
   content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   tags?: InputMaybe<TagRelateToManyForCreateInput>;
   title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PostManyRelationFilter = {
@@ -395,6 +441,7 @@ export type PostOrderByInput = {
   createdAt?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
   title?: InputMaybe<OrderDirection>;
+  titleGerman?: InputMaybe<OrderDirection>;
 };
 
 export type PostRelateToManyForCreateInput = {
@@ -416,9 +463,11 @@ export type PostUpdateArgs = {
 
 export type PostUpdateInput = {
   content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   tags?: InputMaybe<TagRelateToManyForUpdateInput>;
   title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type PostWhereInput = {
@@ -429,10 +478,21 @@ export type PostWhereInput = {
   id?: InputMaybe<IdFilter>;
   tags?: InputMaybe<TagManyRelationFilter>;
   title?: InputMaybe<StringFilter>;
+  titleGerman?: InputMaybe<StringFilter>;
 };
 
 export type PostWhereUniqueInput = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type Post_ContentGerman_Document = {
+  __typename?: 'Post_contentGerman_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Post_ContentGerman_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
 };
 
 export type Post_Content_Document = {
@@ -445,6 +505,151 @@ export type Post_Content_DocumentDocumentArgs = {
   hydrateRelationships?: Scalars['Boolean']['input'];
 };
 
+export type Project = {
+  __typename?: 'Project';
+  content?: Maybe<Project_Content_Document>;
+  contentGerman?: Maybe<Project_ContentGerman_Document>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  finishedAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  shortDescription?: Maybe<Project_ShortDescription_Document>;
+  shortDescriptionGerman?: Maybe<Project_ShortDescriptionGerman_Document>;
+  startedAt?: Maybe<Scalars['DateTime']['output']>;
+  tags?: Maybe<Array<Tag>>;
+  tagsCount?: Maybe<Scalars['Int']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  titleGerman?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type ProjectTagsArgs = {
+  cursor?: InputMaybe<TagWhereUniqueInput>;
+  orderBy?: Array<TagOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: TagWhereInput;
+};
+
+
+export type ProjectTagsCountArgs = {
+  where?: TagWhereInput;
+};
+
+export type ProjectCreateInput = {
+  content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shortDescription?: InputMaybe<Scalars['JSON']['input']>;
+  shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  tags?: InputMaybe<TagRelateToManyForCreateInput>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProjectManyRelationFilter = {
+  every?: InputMaybe<ProjectWhereInput>;
+  none?: InputMaybe<ProjectWhereInput>;
+  some?: InputMaybe<ProjectWhereInput>;
+};
+
+export type ProjectOrderByInput = {
+  createdAt?: InputMaybe<OrderDirection>;
+  finishedAt?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  startedAt?: InputMaybe<OrderDirection>;
+  title?: InputMaybe<OrderDirection>;
+  titleGerman?: InputMaybe<OrderDirection>;
+};
+
+export type ProjectRelateToManyForCreateInput = {
+  connect?: InputMaybe<Array<ProjectWhereUniqueInput>>;
+  create?: InputMaybe<Array<ProjectCreateInput>>;
+};
+
+export type ProjectRelateToManyForUpdateInput = {
+  connect?: InputMaybe<Array<ProjectWhereUniqueInput>>;
+  create?: InputMaybe<Array<ProjectCreateInput>>;
+  disconnect?: InputMaybe<Array<ProjectWhereUniqueInput>>;
+  set?: InputMaybe<Array<ProjectWhereUniqueInput>>;
+};
+
+export type ProjectUpdateArgs = {
+  data: ProjectUpdateInput;
+  where: ProjectWhereUniqueInput;
+};
+
+export type ProjectUpdateInput = {
+  content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  shortDescription?: InputMaybe<Scalars['JSON']['input']>;
+  shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
+  startedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  tags?: InputMaybe<TagRelateToManyForUpdateInput>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ProjectWhereInput = {
+  AND?: InputMaybe<Array<ProjectWhereInput>>;
+  NOT?: InputMaybe<Array<ProjectWhereInput>>;
+  OR?: InputMaybe<Array<ProjectWhereInput>>;
+  createdAt?: InputMaybe<DateTimeNullableFilter>;
+  finishedAt?: InputMaybe<DateTimeNullableFilter>;
+  id?: InputMaybe<IdFilter>;
+  startedAt?: InputMaybe<DateTimeNullableFilter>;
+  tags?: InputMaybe<TagManyRelationFilter>;
+  title?: InputMaybe<StringFilter>;
+  titleGerman?: InputMaybe<StringFilter>;
+};
+
+export type ProjectWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type Project_ContentGerman_Document = {
+  __typename?: 'Project_contentGerman_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Project_ContentGerman_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
+
+export type Project_Content_Document = {
+  __typename?: 'Project_content_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Project_Content_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
+
+export type Project_ShortDescriptionGerman_Document = {
+  __typename?: 'Project_shortDescriptionGerman_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Project_ShortDescriptionGerman_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
+
+export type Project_ShortDescription_Document = {
+  __typename?: 'Project_shortDescription_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Project_ShortDescription_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   authenticatedItem?: Maybe<AuthenticatedItem>;
@@ -452,6 +657,9 @@ export type Query = {
   post?: Maybe<Post>;
   posts?: Maybe<Array<Post>>;
   postsCount?: Maybe<Scalars['Int']['output']>;
+  project?: Maybe<Project>;
+  projects?: Maybe<Array<Project>>;
+  projectsCount?: Maybe<Scalars['Int']['output']>;
   tag?: Maybe<Tag>;
   tags?: Maybe<Array<Tag>>;
   tagsCount?: Maybe<Scalars['Int']['output']>;
@@ -477,6 +685,25 @@ export type QueryPostsArgs = {
 
 export type QueryPostsCountArgs = {
   where?: PostWhereInput;
+};
+
+
+export type QueryProjectArgs = {
+  where: ProjectWhereUniqueInput;
+};
+
+
+export type QueryProjectsArgs = {
+  cursor?: InputMaybe<ProjectWhereUniqueInput>;
+  orderBy?: Array<ProjectOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ProjectWhereInput;
+};
+
+
+export type QueryProjectsCountArgs = {
+  where?: ProjectWhereInput;
 };
 
 
@@ -543,6 +770,8 @@ export type Tag = {
   name?: Maybe<Scalars['String']['output']>;
   posts?: Maybe<Array<Post>>;
   postsCount?: Maybe<Scalars['Int']['output']>;
+  projects?: Maybe<Array<Project>>;
+  projectsCount?: Maybe<Scalars['Int']['output']>;
 };
 
 
@@ -559,9 +788,24 @@ export type TagPostsCountArgs = {
   where?: PostWhereInput;
 };
 
+
+export type TagProjectsArgs = {
+  cursor?: InputMaybe<ProjectWhereUniqueInput>;
+  orderBy?: Array<ProjectOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: ProjectWhereInput;
+};
+
+
+export type TagProjectsCountArgs = {
+  where?: ProjectWhereInput;
+};
+
 export type TagCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   posts?: InputMaybe<PostRelateToManyForCreateInput>;
+  projects?: InputMaybe<ProjectRelateToManyForCreateInput>;
 };
 
 export type TagManyRelationFilter = {
@@ -595,6 +839,7 @@ export type TagUpdateArgs = {
 export type TagUpdateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
   posts?: InputMaybe<PostRelateToManyForUpdateInput>;
+  projects?: InputMaybe<ProjectRelateToManyForUpdateInput>;
 };
 
 export type TagWhereInput = {
@@ -604,6 +849,7 @@ export type TagWhereInput = {
   id?: InputMaybe<IdFilter>;
   name?: InputMaybe<StringFilter>;
   posts?: InputMaybe<PostManyRelationFilter>;
+  projects?: InputMaybe<ProjectManyRelationFilter>;
 };
 
 export type TagWhereUniqueInput = {
@@ -615,6 +861,7 @@ export type User = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
+  isAdmin?: Maybe<Scalars['Boolean']['output']>;
   name?: Maybe<Scalars['String']['output']>;
   password?: Maybe<PasswordState>;
 };
@@ -635,6 +882,7 @@ export type UserAuthenticationWithPasswordSuccess = {
 export type UserCreateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  isAdmin?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
 };
@@ -643,6 +891,7 @@ export type UserOrderByInput = {
   createdAt?: InputMaybe<OrderDirection>;
   email?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
+  isAdmin?: InputMaybe<OrderDirection>;
   name?: InputMaybe<OrderDirection>;
 };
 
@@ -654,6 +903,7 @@ export type UserUpdateArgs = {
 export type UserUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
+  isAdmin?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   password?: InputMaybe<Scalars['String']['input']>;
 };
@@ -665,6 +915,7 @@ export type UserWhereInput = {
   createdAt?: InputMaybe<DateTimeNullableFilter>;
   email?: InputMaybe<StringFilter>;
   id?: InputMaybe<IdFilter>;
+  isAdmin?: InputMaybe<BooleanFilter>;
   name?: InputMaybe<StringFilter>;
 };
 
@@ -680,7 +931,7 @@ export type GetPostsQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', posts?: Array<{ __typename?: 'Post', id: string, title?: string | null, createdAt?: any | null, content?: { __typename?: 'Post_content_Document', document: any } | null, tags?: Array<{ __typename?: 'Tag', id: string, name?: string | null }> | null }> | null };
+export type GetPostsQuery = { __typename?: 'Query', posts?: Array<{ __typename?: 'Post', id: string, title?: string | null, titleGerman?: string | null, createdAt?: any | null, content?: { __typename?: 'Post_content_Document', document: any } | null, contentGerman?: { __typename?: 'Post_contentGerman_Document', document: any } | null, tags?: Array<{ __typename?: 'Tag', id: string, name?: string | null }> | null }> | null };
 
 
-export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPosts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PostOrderByInput"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
+export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPosts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PostOrderByInput"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}},{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;

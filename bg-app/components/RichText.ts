@@ -13,11 +13,12 @@ interface TextNode {
 interface ElementNode {
   type: string
   children: (TextNode | ElementNode)[]
-  url?: string
+  href?: string
+  src?: string
   alt?: string
 }
 
-type SlateNode = TextNode | ElementNode
+export type SlateNode = TextNode | ElementNode
 
 function RichText({ 'initial-value': initialValue }: { 'initial-value': SlateNode[] }) {
   if (!initialValue || initialValue.length === 0) {
@@ -38,7 +39,6 @@ function renderNode(node: SlateNode, key: number): VNode {
   }
 
   const children = RichText({ 'initial-value': node.children })
-
   switch (node.type) {
     case 'paragraph':
       return h('p', { key }, children)
@@ -61,9 +61,9 @@ function renderNode(node: SlateNode, key: number): VNode {
     case 'list-item':
       return h('li', { key }, children)
     case 'link':
-      return h('a', { key, href: node.url, target: '_blank', rel: 'noopener noreferrer' }, children)
+      return h('a', { key, href: node.href, class: 'link link-info', target: '_blank', rel: 'noopener noreferrer' }, children)
     case 'image':
-      return h('img', { key, src: node.url, alt: node.alt || '' })
+      return h('img', { key, src: node.src, alt: node.alt || '' })
     case 'blockquote':
       return h('blockquote', { key }, children)
     case 'code-block':

@@ -7,6 +7,7 @@ type User {
   email: String
   password: PasswordState
   createdAt: DateTime
+  isAdmin: Boolean
 }
 
 type PasswordState {
@@ -28,6 +29,7 @@ input UserWhereInput {
   name: StringFilter
   email: StringFilter
   createdAt: DateTimeNullableFilter
+  isAdmin: BooleanFilter
 }
 
 input IDFilter {
@@ -86,11 +88,17 @@ input DateTimeNullableFilter {
   not: DateTimeNullableFilter
 }
 
+input BooleanFilter {
+  equals: Boolean
+  not: BooleanFilter
+}
+
 input UserOrderByInput {
   id: OrderDirection
   name: OrderDirection
   email: OrderDirection
   createdAt: OrderDirection
+  isAdmin: OrderDirection
 }
 
 enum OrderDirection {
@@ -103,6 +111,7 @@ input UserUpdateInput {
   email: String
   password: String
   createdAt: DateTime
+  isAdmin: Boolean
 }
 
 input UserUpdateArgs {
@@ -115,18 +124,25 @@ input UserCreateInput {
   email: String
   password: String
   createdAt: DateTime
+  isAdmin: Boolean
 }
 
 type Post {
   id: ID!
   title: String
+  titleGerman: String
   createdAt: DateTime
   content: Post_content_Document
+  contentGerman: Post_contentGerman_Document
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
 }
 
 type Post_content_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Post_contentGerman_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
 
@@ -140,6 +156,7 @@ input PostWhereInput {
   NOT: [PostWhereInput!]
   id: IDFilter
   title: StringFilter
+  titleGerman: StringFilter
   createdAt: DateTimeNullableFilter
   tags: TagManyRelationFilter
 }
@@ -153,13 +170,16 @@ input TagManyRelationFilter {
 input PostOrderByInput {
   id: OrderDirection
   title: OrderDirection
+  titleGerman: OrderDirection
   createdAt: OrderDirection
 }
 
 input PostUpdateInput {
   title: String
+  titleGerman: String
   createdAt: DateTime
   content: JSON
+  contentGerman: JSON
   tags: TagRelateToManyForUpdateInput
 }
 
@@ -177,8 +197,10 @@ input PostUpdateArgs {
 
 input PostCreateInput {
   title: String
+  titleGerman: String
   createdAt: DateTime
   content: JSON
+  contentGerman: JSON
   tags: TagRelateToManyForCreateInput
 }
 
@@ -192,6 +214,8 @@ type Tag {
   name: String
   posts(where: PostWhereInput! = {}, orderBy: [PostOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PostWhereUniqueInput): [Post!]
   postsCount(where: PostWhereInput! = {}): Int
+  projects(where: ProjectWhereInput! = {}, orderBy: [ProjectOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProjectWhereUniqueInput): [Project!]
+  projectsCount(where: ProjectWhereInput! = {}): Int
 }
 
 input TagWhereUniqueInput {
@@ -205,12 +229,19 @@ input TagWhereInput {
   id: IDFilter
   name: StringFilter
   posts: PostManyRelationFilter
+  projects: ProjectManyRelationFilter
 }
 
 input PostManyRelationFilter {
   every: PostWhereInput
   some: PostWhereInput
   none: PostWhereInput
+}
+
+input ProjectManyRelationFilter {
+  every: ProjectWhereInput
+  some: ProjectWhereInput
+  none: ProjectWhereInput
 }
 
 input TagOrderByInput {
@@ -221,6 +252,7 @@ input TagOrderByInput {
 input TagUpdateInput {
   name: String
   posts: PostRelateToManyForUpdateInput
+  projects: ProjectRelateToManyForUpdateInput
 }
 
 input PostRelateToManyForUpdateInput {
@@ -228,6 +260,13 @@ input PostRelateToManyForUpdateInput {
   set: [PostWhereUniqueInput!]
   create: [PostCreateInput!]
   connect: [PostWhereUniqueInput!]
+}
+
+input ProjectRelateToManyForUpdateInput {
+  disconnect: [ProjectWhereUniqueInput!]
+  set: [ProjectWhereUniqueInput!]
+  create: [ProjectCreateInput!]
+  connect: [ProjectWhereUniqueInput!]
 }
 
 input TagUpdateArgs {
@@ -238,11 +277,105 @@ input TagUpdateArgs {
 input TagCreateInput {
   name: String
   posts: PostRelateToManyForCreateInput
+  projects: ProjectRelateToManyForCreateInput
 }
 
 input PostRelateToManyForCreateInput {
   create: [PostCreateInput!]
   connect: [PostWhereUniqueInput!]
+}
+
+input ProjectRelateToManyForCreateInput {
+  create: [ProjectCreateInput!]
+  connect: [ProjectWhereUniqueInput!]
+}
+
+type Project {
+  id: ID!
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  startedAt: DateTime
+  finishedAt: DateTime
+  shortDescription: Project_shortDescription_Document
+  content: Project_content_Document
+  shortDescriptionGerman: Project_shortDescriptionGerman_Document
+  contentGerman: Project_contentGerman_Document
+  tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
+  tagsCount(where: TagWhereInput! = {}): Int
+}
+
+type Project_shortDescription_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Project_content_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Project_shortDescriptionGerman_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Project_contentGerman_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+input ProjectWhereUniqueInput {
+  id: ID
+}
+
+input ProjectWhereInput {
+  AND: [ProjectWhereInput!]
+  OR: [ProjectWhereInput!]
+  NOT: [ProjectWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  titleGerman: StringFilter
+  createdAt: DateTimeNullableFilter
+  startedAt: DateTimeNullableFilter
+  finishedAt: DateTimeNullableFilter
+  tags: TagManyRelationFilter
+}
+
+input ProjectOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  titleGerman: OrderDirection
+  createdAt: OrderDirection
+  startedAt: OrderDirection
+  finishedAt: OrderDirection
+}
+
+input ProjectUpdateInput {
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  startedAt: DateTime
+  finishedAt: DateTime
+  shortDescription: JSON
+  content: JSON
+  shortDescriptionGerman: JSON
+  contentGerman: JSON
+  tags: TagRelateToManyForUpdateInput
+}
+
+input ProjectUpdateArgs {
+  where: ProjectWhereUniqueInput!
+  data: ProjectUpdateInput!
+}
+
+input ProjectCreateInput {
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  startedAt: DateTime
+  finishedAt: DateTime
+  shortDescription: JSON
+  content: JSON
+  shortDescriptionGerman: JSON
+  contentGerman: JSON
+  tags: TagRelateToManyForCreateInput
 }
 
 """
@@ -269,6 +402,12 @@ type Mutation {
   updateTags(data: [TagUpdateArgs!]!): [Tag]
   deleteTag(where: TagWhereUniqueInput!): Tag
   deleteTags(where: [TagWhereUniqueInput!]!): [Tag]
+  createProject(data: ProjectCreateInput!): Project
+  createProjects(data: [ProjectCreateInput!]!): [Project]
+  updateProject(where: ProjectWhereUniqueInput!, data: ProjectUpdateInput!): Project
+  updateProjects(data: [ProjectUpdateArgs!]!): [Project]
+  deleteProject(where: ProjectWhereUniqueInput!): Project
+  deleteProjects(where: [ProjectWhereUniqueInput!]!): [Project]
   endSession: Boolean!
   authenticateUserWithPassword(email: String!, password: String!): UserAuthenticationWithPasswordResult
   createInitialUser(data: CreateInitialUserInput!): UserAuthenticationWithPasswordSuccess!
@@ -301,6 +440,9 @@ type Query {
   tag(where: TagWhereUniqueInput!): Tag
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
+  project(where: ProjectWhereUniqueInput!): Project
+  projects(where: ProjectWhereInput! = {}, orderBy: [ProjectOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProjectWhereUniqueInput): [Project!]
+  projectsCount(where: ProjectWhereInput! = {}): Int
   keystone: KeystoneMeta!
   authenticatedItem: AuthenticatedItem
 }

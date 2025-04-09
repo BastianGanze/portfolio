@@ -5,7 +5,7 @@ import { environment } from './environment'
 const { withAuth } = createAuth({
   listKey: 'User',
   identityField: 'email',
-  sessionData: 'name createdAt',
+  sessionData: 'name createdAt isAdmin',
   secretField: 'password',
   initFirstItem: {
     fields: ['name', 'email', 'password'],
@@ -19,4 +19,13 @@ const session = statelessSessions({
   secret: environment.sessionSecret,
 })
 
-export { session, withAuth }
+interface Session {
+  data: {
+    id: string
+    isAdmin: boolean
+  }
+}
+
+const isAdmin = ({ session }: { session?: Session }) => Boolean(session?.data.isAdmin)
+
+export { isAdmin, session, withAuth }

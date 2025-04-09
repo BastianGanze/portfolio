@@ -12,7 +12,7 @@ sleep 20
 
 podman stop bgDb && lsof -i | grep 5444 | awk '{print $2}' | xargs kill -9
 
-sudo rsync -ah --progress -e "ssh -i ~/.ssh/netcup/playground/id_rsa" root@${server}:/var/lib/podman/volumes/bg-db/* ${data_dir}/
+sudo rsync -ah --progress -e "ssh -i /home/shiku/.ssh/netcup/playground/id_rsa" root@${server}:/var/lib/podman/volumes/bg-db/* ${data_dir}/
 
 sudo chmod 777 -R ${data_dir}/ && sudo chown 100998 -R ${data_dir}/
 

@@ -27,13 +27,21 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['@nuxtjs/apollo', '@pinia/nuxt', '@nuxt/icon'],
+  modules: ['@nuxtjs/apollo', '@pinia/nuxt', '@nuxt/icon', '@nuxtjs/google-fonts'],
   apollo: {
     clients: {
       default: {
         httpEndpoint: process.env.GRAPHQL_ENDPOINT || 'http://localhost:3333/graphql',
       },
     },
+  },
+  googleFonts: {
+    families: {
+      Lato: [300, 400, 700],
+    },
+    display: 'swap',
+    download: true,
+    preconnect: true,
   },
   vite: {
     plugins: [tailwindcss()],

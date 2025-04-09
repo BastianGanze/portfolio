@@ -17,18 +17,36 @@ model User {
   email     String    @unique @default("")
   password  String
   createdAt DateTime? @default(now())
+  isAdmin   Boolean   @default(false)
 }
 
 model Post {
-  id        String    @id @default(cuid())
-  title     String    @default("")
-  createdAt DateTime? @default(now())
-  content   Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
-  tags      Tag[]     @relation("Post_tags")
+  id            String    @id @default(cuid())
+  title         String    @default("")
+  titleGerman   String    @default("")
+  createdAt     DateTime? @default(now())
+  content       Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  contentGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  tags          Tag[]     @relation("Post_tags")
 }
 
 model Tag {
-  id    String @id @default(cuid())
-  name  String @default("")
-  posts Post[] @relation("Post_tags")
+  id       String    @id @default(cuid())
+  name     String    @default("")
+  posts    Post[]    @relation("Post_tags")
+  projects Project[] @relation("Project_tags")
+}
+
+model Project {
+  id                     String    @id @default(cuid())
+  title                  String    @default("")
+  titleGerman            String    @default("")
+  createdAt              DateTime? @default(now())
+  startedAt              DateTime?
+  finishedAt             DateTime?
+  shortDescription       Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  content                Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  shortDescriptionGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  contentGerman          Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  tags                   Tag[]     @relation("Project_tags")
 }

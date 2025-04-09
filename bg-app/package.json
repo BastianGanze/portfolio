@@ -16,6 +16,7 @@
     "@apollo/client": "^3.13.6",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@nuxt/icon": "^1.11.0",
+    "@nuxtjs/google-fonts": "^3.2.0",
     "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.1.1",
     "daisyui": "^5.0.12",
@@ -35,6 +36,7 @@
     "@iconify-json/line-md": "^1.2.5",
     "@keystone-6/document-renderer": "^1.1.2",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "@tailwindcss/typography": "^0.5.16",
     "slate": "^0.112.0"
   }
 }
