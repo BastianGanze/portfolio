@@ -1,4 +1,5 @@
 import type { VNode } from 'vue'
+import { match, P } from 'ts-pattern'
 import { h } from 'vue'
 
 interface TextNode {
@@ -10,17 +11,22 @@ interface TextNode {
   strikethrough?: boolean
 }
 
-interface ElementNode {
-  type: string
-  children: (TextNode | ElementNode)[]
-  href?: string
-  src?: string
-  alt?: string
+type ElementNode = {
+  type: 'paragraph'
+  children: SlateNode[]
+} | {
+  type: 'link'
+  href: string
+  children: SlateNode[]
+} | {
+  type: 'heading'
+  level: number
+  children: SlateNode[]
 }
 
 export type SlateNode = TextNode | ElementNode
 
-function RichText({ 'initial-value': initialValue }: { 'initial-value': SlateNode[] }) {
+function RichText({ document: initialValue }: { document: SlateNode[] }) {
   if (!initialValue || initialValue.length === 0) {
     return h('span', {}, '')
   }
@@ -38,41 +44,20 @@ function renderNode(node: SlateNode, key: number): VNode {
     return renderTextNode(node, key)
   }
 
-  const children = RichText({ 'initial-value': node.children })
-  switch (node.type) {
-    case 'paragraph':
+  const children = RichText({ document: node.children })
+  return match(node)
+    .with({ type: 'heading', level: P.select() }, (level) => {
+      return h(`h${level}`, { key }, children)
+    })
+    .with({ type: 'paragraph' }, () => {
       return h('p', { key }, children)
-    case 'heading-one':
-      return h('h1', { key }, children)
-    case 'heading-two':
-      return h('h2', { key }, children)
-    case 'heading-three':
-      return h('h3', { key }, children)
-    case 'heading-four':
-      return h('h4', { key }, children)
-    case 'heading-five':
-      return h('h5', { key }, children)
-    case 'heading-six':
-      return h('h6', { key }, children)
-    case 'bulleted-list':
-      return h('ul', { key }, children)
-    case 'numbered-list':
-      return h('ol', { key }, children)
-    case 'list-item':
-      return h('li', { key }, children)
-    case 'link':
-      return h('a', { key, href: node.href, class: 'link link-info', target: '_blank', rel: 'noopener noreferrer' }, children)
-    case 'image':
-      return h('img', { key, src: node.src, alt: node.alt || '' })
-    case 'blockquote':
-      return h('blockquote', { key }, children)
-    case 'code-block':
-      return h('pre', { key }, [h('code', {}, children)])
-    case 'divider':
-      return h('hr', { key })
-    default:
+    })
+    .with({ type: 'link', href: P.select() }, (href) => {
+      return h('a', { key, href, class: 'link link-info', target: '_blank', rel: 'noopener noreferrer' }, children)
+    })
+    .otherwise(() => {
       return h('div', { key }, children)
-  }
+    })
 }
 
 function renderTextNode(node: TextNode, key: number): VNode {

@@ -18,7 +18,7 @@ watch(themeName, () => {
 
 <template>
   <div :key="locale" class="flex justify-center align-middle flex-wrap relative">
-    <div class="main flex justify-center align-middle flex-wrap relative w-9/10 gap-5">
+    <div class="main flex justify-center align-middle flex-wrap relative w-9/10">
       <div class="navbar">
         <div class="navbar-start">
           <NuxtLink to="/" class="btn btn-ghost normal-case text-xl">
@@ -54,7 +54,7 @@ watch(themeName, () => {
         </div>
       </div>
       <NuxtPage />
-      <div class="footer footer-center footer-horizontal bg-base-200 t ext-base-content">
+      <div class="footer footer-center footer-horizontal bg-base-200 bg-footer">
         <nav class="grid grid-flow-col gap-4">
           <NuxtLink to="/impressum" class="link link-hover">
             {{ t('legalNotice') }}
@@ -84,6 +84,9 @@ watch(themeName, () => {
 <style>
 .main {
   max-width: 1080px;
+}
+.bg-footer {
+  margin-top: 2em;
 }
 .bubbles-overlay {
   position: absolute;

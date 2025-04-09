@@ -51,7 +51,7 @@ const posts = computed(() => {
           <h2>
             {{ post.title }}
           </h2>
-          <RichText v-if="post.document" :initial-value="post.document" />
+          <RichText v-if="post.document" :document="post.document" />
         </article>
       </div>
     </div>
