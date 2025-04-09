@@ -26,29 +26,29 @@ watch(themeName, () => {
           </NuxtLink>
         </div>
         <div class="navbar-end gap-3">
-          <button type="button" class="btn btn-ghost btn-circle" @click="() => showNavBubbles = !showNavBubbles">
+          <button type="button" aria-label="Navigation" class="btn btn-ghost btn-circle" @click="() => showNavBubbles = !showNavBubbles">
             <Icon size="2rem" name="line-md:compass-filled-loop" />
           </button>
-          <button type="button" class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
+          <button type="button" aria-label="Switch Theme" class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
             <Icon size="2rem" :name="themeIcon" />
           </button>
-          <button type="button" class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
+          <button type="button" aria-label="Switch Language" class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
             {{ locale }}
           </button>
         </div>
       </div>
       <div v-if="showNavBubbles" class="bubbles-overlay">
         <div class="bubbles-wrap">
-          <NuxtLink to="/" class="bubble bubble-1" @click="showNavBubbles = false">
+          <NuxtLink aria-label="Go to home" to="/" class="bubble bubble-1" @click="showNavBubbles = false">
             <Icon class="bubble-icon bubble-icon-1" name="line-md:home-md" />
           </NuxtLink>
-          <NuxtLink to="/games" class="bubble bubble-2" @click="showNavBubbles = false">
+          <NuxtLink aria-label="Go to games" to="/games" class="bubble bubble-2" @click="showNavBubbles = false">
             <Icon class="bubble-icon bubble-icon-2" name="line-md:play" />
           </NuxtLink>
-          <NuxtLink to="/projects" class="bubble bubble-3" @click="showNavBubbles = false">
+          <NuxtLink aria-label="Go to projects" to="/projects" class="bubble bubble-3" @click="showNavBubbles = false">
             <Icon class="bubble-icon bubble-icon-3" name="line-md:briefcase" />
           </NuxtLink>
-          <NuxtLink to="/contact" class="bubble bubble-4" @click="showNavBubbles = false">
+          <NuxtLink aria-label="Go to contact info" to="/contact" class="bubble bubble-4" @click="showNavBubbles = false">
             <Icon class="bubble-icon bubble-icon-4" name="line-md:email" />
           </NuxtLink>
         </div>
@@ -56,10 +56,10 @@ watch(themeName, () => {
       <NuxtPage />
       <div class="footer footer-center footer-horizontal bg-base-200 bg-footer">
         <nav class="grid grid-flow-col gap-4">
-          <NuxtLink to="/impressum" class="link link-hover">
+          <NuxtLink aria-label="Go to legal notice" to="/impressum" class="link link-hover">
             {{ t('legalNotice') }}
           </NuxtLink>
-          <NuxtLink to="/contact" class="link link-hover">
+          <NuxtLink aria-label="Go to contact info" to="/contact" class="link link-hover">
             {{ t('contact') }}
           </NuxtLink>
         </nav>

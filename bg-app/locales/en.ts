@@ -9,6 +9,6 @@ export const en = {
         Dinterstraße 28
         04157 Leipzig`,
   impressumContact: `Contact
-        Phone: <a class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
-        E-Mail: <a class="link link-info" href="mailto:%{email}">%{email}</a>`,
+        Phone: <a aria-label="Call via phone" class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
+        E-Mail: <a aria-label="Send an e-mail" class="link link-info" href="mailto:%{email}">%{email}</a>`,
 }

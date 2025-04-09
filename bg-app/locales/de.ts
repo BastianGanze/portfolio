@@ -11,6 +11,6 @@ export const de = {
         Dinterstraße 28
         04157 Leipzig`,
   impressumContact: `Kontakt
-        Telefon: <a class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
-        E-Mail: <a class="link link-info" href="mailto:%{email}">%{email}</a>`,
+        Telefon: <a aria-label="Anrufen" class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
+        E-Mail: <a aria-label="E-Mail senden" class="link link-info" href="mailto:%{email}">%{email}</a>`,
 } satisfies typeof en
