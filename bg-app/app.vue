@@ -65,10 +65,10 @@ watch(themeName, () => {
         </nav>
         <nav>
           <div class="grid grid-flow-col gap-4">
-            <a href="https://linkedin.com/in/bastianganze">
+            <a aria-label="Bastian Ganze LinkedIn profile" target="_blank" href="https://linkedin.com/in/bastianganze">
               <Icon size="2rem" name="line-md:linkedin" />
             </a>
-            <a href="https://github.com/BastianGanze">
+            <a aria-label="Bastian Ganze Github page" target="_blank" href="https://github.com/BastianGanze">
               <Icon size="2rem" name="line-md:github-loop" />
             </a>
           </div>
