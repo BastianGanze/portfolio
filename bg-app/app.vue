@@ -17,8 +17,8 @@ watch(themeName, () => {
 </script>
 
 <template>
-  <div :key="locale" class="flex justify-center align-middle flex-wrap relative">
-    <div class="main flex justify-center align-middle flex-wrap relative w-9/10">
+  <div :key="locale" class="flex justify-center align-middle flex-wrap relative h-full">
+    <div class="main relative w-9/10" :class="{ 'main--nav-active': showNavBubbles }">
       <div class="navbar">
         <div class="navbar-start">
           <NuxtLink to="/" class="btn btn-ghost normal-case text-xl">
@@ -35,22 +35,6 @@ watch(themeName, () => {
           <button type="button" aria-label="Switch Language" class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
             {{ locale }}
           </button>
-        </div>
-      </div>
-      <div v-if="showNavBubbles" class="bubbles-overlay">
-        <div class="bubbles-wrap">
-          <NuxtLink aria-label="Go to home" to="/" class="bubble bubble-1" @click="showNavBubbles = false">
-            <Icon class="bubble-icon bubble-icon-1" name="line-md:home-md" />
-          </NuxtLink>
-          <NuxtLink aria-label="Go to games" to="/games" class="bubble bubble-2" @click="showNavBubbles = false">
-            <Icon class="bubble-icon bubble-icon-2" name="line-md:play" />
-          </NuxtLink>
-          <NuxtLink aria-label="Go to projects" to="/projects" class="bubble bubble-3" @click="showNavBubbles = false">
-            <Icon class="bubble-icon bubble-icon-3" name="line-md:briefcase" />
-          </NuxtLink>
-          <NuxtLink aria-label="Go to contact info" to="/contact" class="bubble bubble-4" @click="showNavBubbles = false">
-            <Icon class="bubble-icon bubble-icon-4" name="line-md:email" />
-          </NuxtLink>
         </div>
       </div>
       <NuxtPage />
@@ -78,12 +62,31 @@ watch(themeName, () => {
         </aside>
       </div>
     </div>
+    <div v-if="showNavBubbles" class="bubbles-overlay">
+      <div class="bubbles-wrap">
+        <NuxtLink aria-label="Go to home" to="/" class="bubble bubble-1" @click="showNavBubbles = false">
+          <Icon class="bubble-icon bubble-icon-1" name="line-md:home-md" />
+        </NuxtLink>
+        <NuxtLink aria-label="Go to games" to="/games" class="bubble bubble-2" @click="showNavBubbles = false">
+          <Icon class="bubble-icon bubble-icon-2" name="line-md:play" />
+        </NuxtLink>
+        <NuxtLink aria-label="Go to projects" to="/projects" class="bubble bubble-3" @click="showNavBubbles = false">
+          <Icon class="bubble-icon bubble-icon-3" name="line-md:briefcase" />
+        </NuxtLink>
+        <button type="button" aria-label="Close navigation" class="bubble bubble-4" @click="showNavBubbles = false">
+          <Icon class="bubble-icon bubble-icon-4" name="line-md:close-circle" />
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <style>
 .main {
   max-width: 1080px;
+}
+.main--nav-active{
+  filter: blur(2px);
 }
 .bg-footer {
   margin-top: 2em;
@@ -97,9 +100,14 @@ watch(themeName, () => {
   pointer-events: none;
   display: flex;
   justify-content: center;
-  gap: 20px;
+  background-color: rgba(76, 118, 197, 0.11);
   padding-top: 100px;
   z-index: 5000;
+  mask-composite: exclude;
+  --bubble-size: 150px;
+  --bubble-padding: -25px;
+  --start-bubble-x: calc(var(--bubble-size) / -2);
+  --start-bubble-y: -50px;
 }
 .bubbles-wrap {
   position: relative;
@@ -109,25 +117,25 @@ watch(themeName, () => {
 }
 .bubble {
   position: absolute;
-  width: 200px;
-  height: 200px;
+  width: var(--bubble-size);
+  height: var(--bubble-size);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(4px);
   border-radius: 50%;
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
   pointer-events: auto;
   cursor: pointer;
+  transition: left 0.5s, top 0.5s;
 }
 .bubble:after {
   position: absolute;
   content: "";
-  min-width: 200px;
-  min-height: 200px;
+  min-width: 150px;
+  min-height: 150px;
   border-radius: 50%;
   overflow: visible;
   backdrop-filter: drop-shadow(4px 4px 10px rgba(255, 255, 255, 0.45)) blur(5px);
@@ -140,8 +148,8 @@ watch(themeName, () => {
 
 .bubble-1 {
   background: radial-gradient(circle, rgba(119, 243, 65, 0.15) 0%, rgba(0, 50, 255, 0.15) 80%);
-  left: -300px;
-  top: 75px;
+  left: var(--start-bubble-x);
+  top: var(--start-bubble-y);
 }
 
 .bubble-icon-1 {
@@ -150,8 +158,8 @@ watch(themeName, () => {
 
 .bubble-2 {
   background: radial-gradient(circle, rgba(63,94,251,0.15) 20%, rgba(252,70,107,0.15) 80%);
-  left: -100px;
-  top: -100px;
+  left: calc(var(--start-bubble-x) - var(--bubble-size) - var(--bubble-padding));
+  top: calc(var(--start-bubble-y) + var(--bubble-size) + var(--bubble-padding));
 }
 
 .bubble-icon-2 {
@@ -160,8 +168,8 @@ watch(themeName, () => {
 
 .bubble-3 {
   background: radial-gradient(circle, rgba(168, 202, 255, 0.15) 20%, rgba(0, 189, 179, 0.15) 80%);
-  left: 100px;
-  top: 75px;
+  left: calc(var(--start-bubble-x) + var(--bubble-size) + var(--bubble-padding));
+  top: calc(var(--start-bubble-y) + var(--bubble-size) + var(--bubble-padding));
 }
 
 .bubble-icon-3 {
@@ -170,8 +178,8 @@ watch(themeName, () => {
 
 .bubble-4 {
   background: radial-gradient(circle, rgba(168, 202, 255, 0.15) 20%, rgba(0, 189, 179, 0.15) 80%);
-  left: -100px;
-  top: 250px;
+  left: calc(var(--start-bubble-x));
+  top: calc(var(--start-bubble-y) + var(--bubble-size) * 2 + var(--bubble-padding) * 2);
 }
 
 .bubble-icon-4 {

@@ -5,9 +5,11 @@
 }
 
 @plugin "daisyui/theme" {
+    //noinspection
     name: "dark";
     default: true;
     prefersdark: true;
+    //noinspection
     color-scheme: "dark";
     --default-font-family: "Lato";
     --color-base-100: oklch(12% 0.042 264.695);
@@ -41,9 +43,11 @@
     --noise: 0;
 }
 @plugin "daisyui/theme" {
+    //noinspection
     name: "light";
     default: false;
     prefersdark: false;
+    //noinspection
     color-scheme: "light";
     --color-base-100: oklch(100% 0 0);
     --color-base-200: oklch(93% 0 0);
@@ -73,4 +77,9 @@
     --border: 0.5px;
     --depth: 1;
     --noise: 0;
+}
+
+html,body, #__nuxt {
+    height:100%;
+    min-height:100%;
 }

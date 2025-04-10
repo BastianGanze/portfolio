@@ -11,4 +11,5 @@ export const en = {
   impressumContact: `Contact
         Phone: <a aria-label="Call via phone" class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
         E-Mail: <a aria-label="Send an e-mail" class="link link-info" href="mailto:%{email}">%{email}</a>`,
+  underConstruction: 'Under Construction',
 }
