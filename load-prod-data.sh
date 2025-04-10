@@ -6,7 +6,7 @@ server=v2202401194870253208.nicesrv.de
 
 sudo chmod 777 ${data_dir} && sudo rm -rf ${data_dir}/*
 
-podman run --network my_network --name bgDb -p 5444:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=6JrEmGSaq2JVJgPodaLwtnDZq -e POSTGRES_DB=bgdb -d -v ${data_dir}:/var/lib/postgresql/data atsume-db
+podman run --network my_network --name bgDb -p 5444:5432 -d -v ${data_dir}:/var/lib/postgresql/data atsume-db
 
 sleep 20
 

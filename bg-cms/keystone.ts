@@ -12,6 +12,17 @@ export default withAuth(
     server: {
       cors: { origin: environment.cors?.split('|'), credentials: true },
     },
+    storage: {
+      bg_images: {
+        kind: 'local',
+        type: 'image',
+        generateUrl: path => `${environment.baseUrl}/images${path}`,
+        serverRoute: {
+          path: '/images',
+        },
+        storagePath: 'public/images',
+      },
+    },
     lists,
     session,
   }),

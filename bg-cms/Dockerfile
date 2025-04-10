@@ -29,6 +29,8 @@ RUN --mount=type=secret,id=db_username \
 
 RUN npm run build
 
+RUN mkdir -p public/images
+
 EXPOSE 3000
 
 CMD ["npm", "run", "start"]

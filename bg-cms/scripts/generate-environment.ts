@@ -28,6 +28,7 @@ const environmentContent = `export const environment = {
   dbPort: ${process.env.DB_PORT},
   sessionSecret: "${process.env.SESSION_SECRET}",
   cors: '${process.env.CORS}',
+  baseUrl: '${process.env.BASE_URL}',
   get postgresUrl() {
     return \`postgres://\${this.dbUsername}:\${this.dbPassword}@\${this.dbHost}:\${this.dbPort}/\${this.dbDatabase}\`;
   },

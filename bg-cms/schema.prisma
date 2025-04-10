@@ -44,6 +44,12 @@ model Project {
   createdAt              DateTime? @default(now())
   startedAt              DateTime?
   finishedAt             DateTime?
+  link                   String    @default("")
+  mainImage_id           String?
+  mainImage_filesize     Int?
+  mainImage_width        Int?
+  mainImage_height       Int?
+  mainImage_extension    String?
   shortDescription       Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   content                Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   shortDescriptionGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")

@@ -5,6 +5,7 @@ import { allowAll } from '@keystone-6/core/access'
 
 import {
   checkbox,
+  image,
   password,
   relationship,
   text,
@@ -25,6 +26,10 @@ export const lists = {
       password: password({ validation: { isRequired: true } }),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
       }),
       isAdmin: checkbox(),
     },
@@ -44,6 +49,10 @@ export const lists = {
       titleGerman: text({ validation: { isRequired: true } }),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
       }),
       content: document({
         formatting: true,
@@ -117,13 +126,25 @@ export const lists = {
       titleGerman: text({ validation: { isRequired: true } }),
       createdAt: timestamp({
         defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
       }),
       startedAt: timestamp({
         db: { isNullable: true },
+        ui: {
+          views: './admin/components/HtmlDatePicker',
+        },
       }),
       finishedAt: timestamp({
         db: { isNullable: true },
+        ui: {
+          views: './admin/components/HtmlDatePicker',
+        },
       }),
+      link: text({}),
+      mainImage: image({ storage: 'bg_images' }),
       shortDescription: document({
         formatting: true,
         layouts: [
