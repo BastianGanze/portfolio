@@ -27,7 +27,6 @@ export function Field({ field, value, onChange }: FieldProps<typeof controller>)
         type="datetime-local"
         ref={dateInput}
         onInput={handleChange}
-        onChange={handleChange}
         className="html-date-picker"
       />
     </FieldContainer>
