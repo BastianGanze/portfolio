@@ -19,7 +19,7 @@
     "@pinia/nuxt": "^0.10.1",
     "@tailwindcss/vite": "^4.1.1",
     "daisyui": "^5.0.12",
-    "dayjs": "^1.11.13",
+    "dayjs-nuxt": "^2.1.11",
     "eslint": "^9.23.0",
     "graphql-tag": "^2.12.6",
     "i18n-js": "^4.5.1",

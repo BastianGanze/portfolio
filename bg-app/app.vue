@@ -147,13 +147,13 @@ watch(themeName, () => {
 }
 
 .bubble-1 {
-  background: radial-gradient(circle, rgba(119, 243, 65, 0.15) 0%, rgba(0, 50, 255, 0.15) 80%);
+  background: radial-gradient(circle, rgba(52, 120, 19, 0.5) 0%, rgba(0, 24, 120, 0.5) 80%);
   left: var(--start-bubble-x);
   top: var(--start-bubble-y);
 }
 
 .bubble-icon-1 {
-  background: radial-gradient(circle, rgba(108, 206, 66, 0.45) 0%, rgba(0, 50, 255, 0.45) 80%);
+  background: radial-gradient(circle, rgba(154, 255, 114, 0.75) 0%, rgba(93, 125, 255, 0.75) 80%);
 }
 
 .bubble-2 {

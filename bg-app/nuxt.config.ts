@@ -27,7 +27,7 @@ export default defineNuxtConfig({
     },
   },
   css: ['~/assets/css/main.css'],
-  modules: ['@nuxtjs/apollo', '@pinia/nuxt', '@nuxt/icon', '@nuxtjs/google-fonts'],
+  modules: ['@nuxtjs/apollo', '@pinia/nuxt', '@nuxt/icon', '@nuxtjs/google-fonts', 'dayjs-nuxt'],
   apollo: {
     clients: {
       default: {
