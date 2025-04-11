@@ -17,6 +17,8 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: { input: any; output: any; }
+  /** The `Upload` scalar type represents a file upload. */
+  Upload: { input: any; output: any; }
 };
 
 export type AuthenticatedItem = User;
@@ -52,6 +54,27 @@ export type IdFilter = {
   lte?: InputMaybe<Scalars['ID']['input']>;
   not?: InputMaybe<IdFilter>;
   notIn?: InputMaybe<Array<Scalars['ID']['input']>>;
+};
+
+export enum ImageExtension {
+  Gif = 'gif',
+  Jpg = 'jpg',
+  Png = 'png',
+  Webp = 'webp'
+}
+
+export type ImageFieldInput = {
+  upload: Scalars['Upload']['input'];
+};
+
+export type ImageFieldOutput = {
+  __typename?: 'ImageFieldOutput';
+  extension: ImageExtension;
+  filesize: Scalars['Int']['output'];
+  height: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+  url: Scalars['String']['output'];
+  width: Scalars['Int']['output'];
 };
 
 export type KeystoneAdminMeta = {
@@ -512,6 +535,8 @@ export type Project = {
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   finishedAt?: Maybe<Scalars['DateTime']['output']>;
   id: Scalars['ID']['output'];
+  link?: Maybe<Scalars['String']['output']>;
+  mainImage?: Maybe<ImageFieldOutput>;
   shortDescription?: Maybe<Project_ShortDescription_Document>;
   shortDescriptionGerman?: Maybe<Project_ShortDescriptionGerman_Document>;
   startedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -540,6 +565,8 @@ export type ProjectCreateInput = {
   contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  link?: InputMaybe<Scalars['String']['input']>;
+  mainImage?: InputMaybe<ImageFieldInput>;
   shortDescription?: InputMaybe<Scalars['JSON']['input']>;
   shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
   startedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -558,6 +585,7 @@ export type ProjectOrderByInput = {
   createdAt?: InputMaybe<OrderDirection>;
   finishedAt?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
+  link?: InputMaybe<OrderDirection>;
   startedAt?: InputMaybe<OrderDirection>;
   title?: InputMaybe<OrderDirection>;
   titleGerman?: InputMaybe<OrderDirection>;
@@ -585,6 +613,8 @@ export type ProjectUpdateInput = {
   contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  link?: InputMaybe<Scalars['String']['input']>;
+  mainImage?: InputMaybe<ImageFieldInput>;
   shortDescription?: InputMaybe<Scalars['JSON']['input']>;
   shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
   startedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -600,6 +630,7 @@ export type ProjectWhereInput = {
   createdAt?: InputMaybe<DateTimeNullableFilter>;
   finishedAt?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<IdFilter>;
+  link?: InputMaybe<StringFilter>;
   startedAt?: InputMaybe<DateTimeNullableFilter>;
   tags?: InputMaybe<TagManyRelationFilter>;
   title?: InputMaybe<StringFilter>;
@@ -933,5 +964,11 @@ export type GetPostsQueryVariables = Exact<{
 
 export type GetPostsQuery = { __typename?: 'Query', posts?: Array<{ __typename?: 'Post', id: string, title?: string | null, titleGerman?: string | null, createdAt?: any | null, content?: { __typename?: 'Post_content_Document', document: any } | null, contentGerman?: { __typename?: 'Post_contentGerman_Document', document: any } | null, tags?: Array<{ __typename?: 'Tag', id: string, name?: string | null }> | null }> | null };
 
+export type QueryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type QueryQuery = { __typename?: 'Query', projects?: Array<{ __typename?: 'Project', finishedAt?: any | null, id: string, link?: string | null, startedAt?: any | null, title?: string | null, titleGerman?: string | null, content?: { __typename?: 'Project_content_Document', document: any } | null, contentGerman?: { __typename?: 'Project_contentGerman_Document', document: any } | null, mainImage?: { __typename?: 'ImageFieldOutput', url: string } | null, shortDescription?: { __typename?: 'Project_shortDescription_Document', document: any } | null, shortDescriptionGerman?: { __typename?: 'Project_shortDescriptionGerman_Document', document: any } | null }> | null };
+
 
 export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPosts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PostOrderByInput"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}},{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
+export const QueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Query"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"finishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"link"}},{"kind":"Field","name":{"kind":"Name","value":"mainImage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescriptionGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}}]}}]}}]} as unknown as DocumentNode<QueryQuery, QueryQueryVariables>;

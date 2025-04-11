@@ -19,3 +19,31 @@ export const GET_POSTS = gql(/* GraphQL */`
     }
   }
 }`)
+
+export const GET_PROJECTS = gql(/* GraphQL */`
+    query Query {
+        projects {
+            content {
+                document
+            }
+            contentGerman {
+                document
+            }
+            finishedAt
+            id
+            link
+            mainImage {
+                url
+            }
+            shortDescription {
+                document
+            }
+            shortDescriptionGerman {
+                document
+            }
+            startedAt
+            title
+            titleGerman
+        }
+    }
+`)
