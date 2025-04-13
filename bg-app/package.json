@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@graphql-codegen/cli": "^5.0.5",
-    "@iconify-json/line-md": "^1.2.5",
+    "@iconify-json/line-md": "^1.2.7",
     "@keystone-6/document-renderer": "^1.1.2",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
     "@tailwindcss/typography": "^0.5.16",

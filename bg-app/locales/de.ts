@@ -14,4 +14,5 @@ export const de = {
         Telefon: <a aria-label="Anrufen" class="link link-info" href="tel:%{phoneTechnical}">%{phoneVisible}</a>
         E-Mail: <a aria-label="E-Mail senden" class="link link-info" href="mailto:%{email}">%{email}</a>`,
   underConstruction: 'In Arbeit',
+  projectGetMoreInfoLink: 'Mehr Infos …',
 } satisfies typeof en
