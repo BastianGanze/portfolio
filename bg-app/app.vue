@@ -157,33 +157,33 @@ watch(themeName, () => {
 }
 
 .bubble-2 {
-  background: radial-gradient(circle, rgba(63,94,251,0.15) 20%, rgba(252,70,107,0.15) 80%);
+  background: radial-gradient(circle, rgba(43, 63, 171, 0.44) 20%, rgba(158, 33, 59, 0.51) 80%);
   left: calc(var(--start-bubble-x) - var(--bubble-size) - var(--bubble-padding));
   top: calc(var(--start-bubble-y) + var(--bubble-size) + var(--bubble-padding));
 }
 
 .bubble-icon-2 {
-  background: radial-gradient(circle, rgba(63,94,251,0.35) 20%, rgba(252,70,107,0.35) 80%);
+  background: radial-gradient(circle, rgba(104, 129, 255, 0.71) 20%, rgba(255, 65, 102, 0.76) 80%);
 }
 
 .bubble-3 {
-  background: radial-gradient(circle, rgba(168, 202, 255, 0.15) 20%, rgba(0, 189, 179, 0.15) 80%);
+  background: radial-gradient(circle, rgba(36, 63, 105, 0.57) 20%, rgba(43, 105, 102, 0.64) 80%);
   left: calc(var(--start-bubble-x) + var(--bubble-size) + var(--bubble-padding));
   top: calc(var(--start-bubble-y) + var(--bubble-size) + var(--bubble-padding));
 }
 
 .bubble-icon-3 {
-  background: radial-gradient(circle, rgba(201, 231, 238, 0.25) 20%, rgba(0, 161, 176, 0.25) 80%);
+  background: radial-gradient(circle, rgba(201, 231, 238, 0.69) 20%, rgba(0, 161, 176, 0.75) 80%);
 }
 
 .bubble-4 {
-  background: radial-gradient(circle, rgba(168, 202, 255, 0.15) 20%, rgba(0, 189, 179, 0.15) 80%);
+  background: radial-gradient(circle, rgba(36, 63, 105, 0.57) 20%, rgba(43, 105, 102, 0.64) 80%);
   left: calc(var(--start-bubble-x));
   top: calc(var(--start-bubble-y) + var(--bubble-size) * 2 + var(--bubble-padding) * 2);
 }
 
 .bubble-icon-4 {
-  background: radial-gradient(circle, rgba(201, 231, 238, 0.25) 20%, rgba(0, 161, 176, 0.25) 80%);
+  background: radial-gradient(circle, rgba(201, 231, 238, 0.72) 20%, rgba(0, 161, 176, 0.72) 80%);
 }
 
 .bubble-icon {
