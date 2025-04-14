@@ -7,7 +7,6 @@ import { GET_PROJECTS } from '~/queries'
 
 const { t } = useLocalizationStore()
 const { locale } = storeToRefs(useLocalizationStore())
-
 const { data } = await useAsyncQuery({
   query: GET_PROJECTS,
   variables: {
@@ -76,6 +75,9 @@ const projects = computed(() => {
                 {{ t('projectGetMoreInfoLink') }}
               </NuxtLink>
             </article>
+          </div>
+          <div v-if="project.mainImage" class="h-full pt-1.5 text-l" :class="{ 'timeline-end md:text-start': index % 2 === 0, 'timeline-start md:text-end': index % 2 !== 0 }">
+            <img aria-label="Project Image" :src="project.mainImage.url" alt="Project Image">
           </div>
         </li>
       </ul>
