@@ -77,7 +77,7 @@ const projects = computed(() => {
             </article>
           </div>
           <div v-if="project.mainImage" class="h-full pt-1.5 text-l" :class="{ 'timeline-end md:text-start': index % 2 === 0, 'timeline-start md:text-end': index % 2 !== 0 }">
-            <img aria-label="Project Image" :src="project.mainImage.url" alt="Project Image">
+            <img class="pt-10 max-h-50" aria-label="Project Image" :src="project.mainImage.url" alt="Project Image">
           </div>
         </li>
       </ul>
