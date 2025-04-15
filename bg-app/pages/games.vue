@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { useGameStore } from '~/stores/gameStore'
+
 const { t } = useLocalizationStore()
+const { connected } = useGameStore()
 </script>
 
 <template>
@@ -8,6 +11,7 @@ const { t } = useLocalizationStore()
       <div role="alert" class="alert alert-info">
         <Icon size="2em" name="line-md:construction" />
         <span>{{ t('underConstruction') }}</span>
+        <span class="flex-1">{{ connected }}</span>
       </div>
     </div>
   </div>
