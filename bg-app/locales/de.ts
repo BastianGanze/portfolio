@@ -4,7 +4,7 @@ export const de = {
   languagesGerman: 'Deutsch',
   languagesEnglish: 'Englisch',
   legalNotice: 'Impressum',
-  contact: 'Kontakt',
+  aboutMe: 'Über mich',
   allRightsReserved: 'Alle Rechte vorbehalten von Bastian Ganze',
   impressumTitle: 'Impressum',
   impressumAddress: `<span class="font-bold">Bastian Ganze</span>

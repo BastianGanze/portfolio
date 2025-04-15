@@ -1,0 +1,1 @@
+ ~/.local/bin/spacetime publish --project-path bg-game-server tic-tac-toe

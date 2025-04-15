@@ -9,6 +9,7 @@ const rootDir = path.resolve(__dirname, '../..');
 const projects = [
   { name: 'bg-app', imageName: 'bg-app' },
   { name: 'bg-cms', imageName: 'bg-cms' },
+  { name: 'bg-game-server', imageName: 'bg-game-server' }
 ];
 
 const checkChanges = (projectName) => {

@@ -2,7 +2,7 @@ export const en = {
   languagesGerman: 'German',
   languagesEnglish: 'English',
   legalNotice: 'Legal Notice',
-  contact: 'Contact',
+  aboutMe: 'About me',
   allRightsReserved: 'All rights reserved by Bastian Ganze',
   impressumTitle: 'Legal Notice',
   impressumAddress: `<span class="font-bold">Bastian Ganze</span>
