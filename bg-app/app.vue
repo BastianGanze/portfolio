@@ -20,7 +20,7 @@ watch(themeName, () => {
     <div class="main relative w-9/10">
       <div class="navbar">
         <div class="navbar-start gap-3">
-          <NuxtLink to="/" class="btn btn-ghost btn-circle">
+          <NuxtLink to="/" aria-label="Go to main page" class="btn btn-ghost btn-circle">
             <Icon name="line-md:home-md" size="2rem" />
           </NuxtLink>
           <NuxtLink aria-label="Go to games" to="/games" class="btn btn-ghost btn-circle">
