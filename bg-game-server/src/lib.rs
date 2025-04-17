@@ -7,6 +7,7 @@ pub struct User {
     name: Option<String>,
     first_seen: Timestamp,
     online: bool,
+    position: (f32, f32),
 }
 
 #[reducer(init)]
@@ -24,6 +25,7 @@ pub fn user_connected(ctx: &ReducerContext) {
             identity: ctx.sender,
             first_seen: ctx.timestamp,
             online: true,
+            position: (0.0, 0.0),
         });
     }
 }
@@ -43,4 +45,16 @@ pub fn say_hello(ctx: &ReducerContext) {
     for user in ctx.db.user().iter() {
         log::info!("Hello, {:?}!", user.name);
     }
+}
+
+#[reducer]
+pub fn move_position(ctx: &ReducerContext) -> Result<(), String> {
+    let user = ctx
+        .db
+        .user()
+        .identity()
+        .find_mut(&ctx.sender)
+        .ok_or("User not found")?;
+    user.position = (user.position.0 + 1.0, user.position.1 + 1.0);
+    Ok(())
 }
