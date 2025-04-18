@@ -3,14 +3,7 @@ import { list } from '@keystone-6/core'
 
 import { allowAll } from '@keystone-6/core/access'
 
-import {
-  checkbox,
-  image,
-  password,
-  relationship,
-  text,
-  timestamp,
-} from '@keystone-6/core/fields'
+import { checkbox, image, integer, password, relationship, text, timestamp } from '@keystone-6/core/fields'
 import { document } from '@keystone-6/fields-document'
 import { isAdmin } from './auth'
 
@@ -193,6 +186,7 @@ export const lists = {
         links: true,
         dividers: true,
       }),
+      roomId: integer(),
       tags: relationship({
         ref: 'Tag.projects',
         many: true,

@@ -303,6 +303,7 @@ type Project {
   content: Project_content_Document
   shortDescriptionGerman: Project_shortDescriptionGerman_Document
   contentGerman: Project_contentGerman_Document
+  roomId: Int
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
 }
@@ -354,7 +355,19 @@ input ProjectWhereInput {
   startedAt: DateTimeNullableFilter
   finishedAt: DateTimeNullableFilter
   link: StringFilter
+  roomId: IntNullableFilter
   tags: TagManyRelationFilter
+}
+
+input IntNullableFilter {
+  equals: Int
+  in: [Int!]
+  notIn: [Int!]
+  lt: Int
+  lte: Int
+  gt: Int
+  gte: Int
+  not: IntNullableFilter
 }
 
 input ProjectOrderByInput {
@@ -365,6 +378,7 @@ input ProjectOrderByInput {
   startedAt: OrderDirection
   finishedAt: OrderDirection
   link: OrderDirection
+  roomId: OrderDirection
 }
 
 input ProjectUpdateInput {
@@ -379,6 +393,7 @@ input ProjectUpdateInput {
   content: JSON
   shortDescriptionGerman: JSON
   contentGerman: JSON
+  roomId: Int
   tags: TagRelateToManyForUpdateInput
 }
 
@@ -406,6 +421,7 @@ input ProjectCreateInput {
   content: JSON
   shortDescriptionGerman: JSON
   contentGerman: JSON
+  roomId: Int
   tags: TagRelateToManyForCreateInput
 }
 

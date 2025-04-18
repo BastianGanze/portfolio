@@ -54,5 +54,6 @@ model Project {
   content                Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   shortDescriptionGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   contentGerman          Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  roomId                 Int?
   tags                   Tag[]     @relation("Project_tags")
 }

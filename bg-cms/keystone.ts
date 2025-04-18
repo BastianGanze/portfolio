@@ -11,6 +11,7 @@ export default withAuth(
     },
     server: {
       cors: { origin: environment.cors?.split('|'), credentials: true },
+      port: 3001,
     },
     storage: {
       bg_images: {
