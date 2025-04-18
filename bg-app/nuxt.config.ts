@@ -45,5 +45,14 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            connections: ['@clockworklabs/spacetimedb-sdk', '@apollo/client'],
+          },
+        },
+      },
+    },
   },
 })

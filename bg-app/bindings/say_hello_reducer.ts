@@ -4,10 +4,33 @@
 /* eslint-disable */
 /* tslint:disable */
 // @ts-nocheck
+import type {
+  CallReducerFlags,
+  DbContext,
+  ErrorContextInterface,
+  Event,
+  EventContextInterface,
+  ReducerEventContextInterface,
+  SubscriptionEventContextInterface,
+} from "@clockworklabs/spacetimedb-sdk";
 import {
   AlgebraicType,
+  AlgebraicValue,
   BinaryReader,
   BinaryWriter,
+  ConnectionId, 
+  DbConnectionBuilder,
+  DbConnectionImpl,
+  Identity,
+  ProductType,
+  ProductTypeElement,
+  SubscriptionBuilderImpl,
+  SumType,
+  SumTypeVariant,
+  TableCache,
+  TimeDuration,
+  Timestamp,
+  deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 
 export type SayHello = {};

@@ -77,6 +77,17 @@ export type ImageFieldOutput = {
   width: Scalars['Int']['output'];
 };
 
+export type IntNullableFilter = {
+  equals?: InputMaybe<Scalars['Int']['input']>;
+  gt?: InputMaybe<Scalars['Int']['input']>;
+  gte?: InputMaybe<Scalars['Int']['input']>;
+  in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  lt?: InputMaybe<Scalars['Int']['input']>;
+  lte?: InputMaybe<Scalars['Int']['input']>;
+  not?: InputMaybe<IntNullableFilter>;
+  notIn?: InputMaybe<Array<Scalars['Int']['input']>>;
+};
+
 export type KeystoneAdminMeta = {
   __typename?: 'KeystoneAdminMeta';
   list?: Maybe<KeystoneAdminUiListMeta>;
@@ -537,6 +548,7 @@ export type Project = {
   id: Scalars['ID']['output'];
   link?: Maybe<Scalars['String']['output']>;
   mainImage?: Maybe<ImageFieldOutput>;
+  roomId?: Maybe<Scalars['Int']['output']>;
   shortDescription?: Maybe<Project_ShortDescription_Document>;
   shortDescriptionGerman?: Maybe<Project_ShortDescriptionGerman_Document>;
   startedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -567,6 +579,7 @@ export type ProjectCreateInput = {
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   link?: InputMaybe<Scalars['String']['input']>;
   mainImage?: InputMaybe<ImageFieldInput>;
+  roomId?: InputMaybe<Scalars['Int']['input']>;
   shortDescription?: InputMaybe<Scalars['JSON']['input']>;
   shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
   startedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -586,6 +599,7 @@ export type ProjectOrderByInput = {
   finishedAt?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
   link?: InputMaybe<OrderDirection>;
+  roomId?: InputMaybe<OrderDirection>;
   startedAt?: InputMaybe<OrderDirection>;
   title?: InputMaybe<OrderDirection>;
   titleGerman?: InputMaybe<OrderDirection>;
@@ -615,6 +629,7 @@ export type ProjectUpdateInput = {
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   link?: InputMaybe<Scalars['String']['input']>;
   mainImage?: InputMaybe<ImageFieldInput>;
+  roomId?: InputMaybe<Scalars['Int']['input']>;
   shortDescription?: InputMaybe<Scalars['JSON']['input']>;
   shortDescriptionGerman?: InputMaybe<Scalars['JSON']['input']>;
   startedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -631,6 +646,7 @@ export type ProjectWhereInput = {
   finishedAt?: InputMaybe<DateTimeNullableFilter>;
   id?: InputMaybe<IdFilter>;
   link?: InputMaybe<StringFilter>;
+  roomId?: InputMaybe<IntNullableFilter>;
   startedAt?: InputMaybe<DateTimeNullableFilter>;
   tags?: InputMaybe<TagManyRelationFilter>;
   title?: InputMaybe<StringFilter>;
@@ -967,8 +983,8 @@ export type GetPostsQuery = { __typename?: 'Query', posts?: Array<{ __typename?:
 export type QueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type QueryQuery = { __typename?: 'Query', projects?: Array<{ __typename?: 'Project', finishedAt?: any | null, id: string, link?: string | null, startedAt?: any | null, title?: string | null, titleGerman?: string | null, content?: { __typename?: 'Project_content_Document', document: any } | null, contentGerman?: { __typename?: 'Project_contentGerman_Document', document: any } | null, mainImage?: { __typename?: 'ImageFieldOutput', url: string } | null, shortDescription?: { __typename?: 'Project_shortDescription_Document', document: any } | null, shortDescriptionGerman?: { __typename?: 'Project_shortDescriptionGerman_Document', document: any } | null }> | null };
+export type QueryQuery = { __typename?: 'Query', projects?: Array<{ __typename?: 'Project', finishedAt?: any | null, id: string, link?: string | null, roomId?: number | null, startedAt?: any | null, title?: string | null, titleGerman?: string | null, content?: { __typename?: 'Project_content_Document', document: any } | null, contentGerman?: { __typename?: 'Project_contentGerman_Document', document: any } | null, mainImage?: { __typename?: 'ImageFieldOutput', url: string } | null, shortDescription?: { __typename?: 'Project_shortDescription_Document', document: any } | null, shortDescriptionGerman?: { __typename?: 'Project_shortDescriptionGerman_Document', document: any } | null }> | null };
 
 
 export const GetPostsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"getPosts"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"PostOrderByInput"}}}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"posts"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"orderBy"},"value":{"kind":"Variable","name":{"kind":"Name","value":"orderBy"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}},{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"tags"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}}]} as unknown as DocumentNode<GetPostsQuery, GetPostsQueryVariables>;
-export const QueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Query"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"finishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"link"}},{"kind":"Field","name":{"kind":"Name","value":"mainImage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescriptionGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}}]}}]}}]} as unknown as DocumentNode<QueryQuery, QueryQueryVariables>;
+export const QueryDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Query"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"projects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"content"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"contentGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"finishedAt"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"link"}},{"kind":"Field","name":{"kind":"Name","value":"mainImage"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"url"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shortDescriptionGerman"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"document"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"startedAt"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"titleGerman"}}]}}]}}]} as unknown as DocumentNode<QueryQuery, QueryQueryVariables>;

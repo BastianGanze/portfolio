@@ -4,39 +4,80 @@
 /* eslint-disable */
 /* tslint:disable */
 // @ts-nocheck
+import type {
+  CallReducerFlags,
+  DbContext,
+  ErrorContextInterface,
+  Event,
+  EventContextInterface,
+  ReducerEventContextInterface,
+  SubscriptionEventContextInterface,
+} from "@clockworklabs/spacetimedb-sdk";
 import {
-  type CallReducerFlags,
+  AlgebraicType,
+  AlgebraicValue,
+  BinaryReader,
+  BinaryWriter,
+  ConnectionId, 
   DbConnectionBuilder,
   DbConnectionImpl,
-  type ErrorContextInterface,
-  type Event,
-  type EventContextInterface,
-  type ReducerEventContextInterface,
+  Identity,
+  ProductType,
+  ProductTypeElement,
   SubscriptionBuilderImpl,
-  type SubscriptionEventContextInterface,
+  SumType,
+  SumTypeVariant,
+  TableCache,
+  TimeDuration,
+  Timestamp,
+  deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 
 // Import and reexport all reducer arg types
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
+import { MovePosition } from "./move_position_reducer.ts";
+export { MovePosition };
+import { MoveToRoom } from "./move_to_room_reducer.ts";
+export { MoveToRoom };
 import { SayHello } from "./say_hello_reducer.ts";
 export { SayHello };
 import { UserConnected } from "./user_connected_reducer.ts";
 export { UserConnected };
 
 // Import and reexport all table handle types
+import { RoomTableHandle } from "./room_table.ts";
+export { RoomTableHandle };
 import { UserTableHandle } from "./user_table.ts";
 export { UserTableHandle };
+import { UserCursorTableHandle } from "./user_cursor_table.ts";
+export { UserCursorTableHandle };
 
 // Import and reexport all types
+import { DbVector2 } from "./db_vector_2_type.ts";
+export { DbVector2 };
+import { Room } from "./room_type.ts";
+export { Room };
 import { User } from "./user_type.ts";
 export { User };
+import { UserCursor } from "./user_cursor_type.ts";
+export { UserCursor };
 
 const REMOTE_MODULE = {
   tables: {
+    room: {
+      tableName: "room",
+      rowType: Room.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+    },
     user: {
       tableName: "user",
       rowType: User.getTypeScriptAlgebraicType(),
+      primaryKey: "identity",
+    },
+    user_cursor: {
+      tableName: "user_cursor",
+      rowType: UserCursor.getTypeScriptAlgebraicType(),
       primaryKey: "identity",
     },
   },
@@ -44,6 +85,14 @@ const REMOTE_MODULE = {
     identity_disconnected: {
       reducerName: "identity_disconnected",
       argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
+    },
+    move_position: {
+      reducerName: "move_position",
+      argsType: MovePosition.getTypeScriptAlgebraicType(),
+    },
+    move_to_room: {
+      reducerName: "move_to_room",
+      argsType: MoveToRoom.getTypeScriptAlgebraicType(),
     },
     say_hello: {
       reducerName: "say_hello",
@@ -81,6 +130,8 @@ const REMOTE_MODULE = {
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
+| { name: "MovePosition", args: MovePosition }
+| { name: "MoveToRoom", args: MoveToRoom }
 | { name: "SayHello", args: SayHello }
 | { name: "UserConnected", args: UserConnected }
 ;
@@ -94,6 +145,38 @@ export class RemoteReducers {
 
   removeOnIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("identity_disconnected", callback);
+  }
+
+  movePosition(position: DbVector2) {
+    const __args = { position };
+    let __writer = new BinaryWriter(1024);
+    MovePosition.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("move_position", __argsBuffer, this.setCallReducerFlags.movePositionFlags);
+  }
+
+  onMovePosition(callback: (ctx: ReducerEventContext, position: DbVector2) => void) {
+    this.connection.onReducer("move_position", callback);
+  }
+
+  removeOnMovePosition(callback: (ctx: ReducerEventContext, position: DbVector2) => void) {
+    this.connection.offReducer("move_position", callback);
+  }
+
+  moveToRoom(room: number) {
+    const __args = { room };
+    let __writer = new BinaryWriter(1024);
+    MoveToRoom.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("move_to_room", __argsBuffer, this.setCallReducerFlags.moveToRoomFlags);
+  }
+
+  onMoveToRoom(callback: (ctx: ReducerEventContext, room: number) => void) {
+    this.connection.onReducer("move_to_room", callback);
+  }
+
+  removeOnMoveToRoom(callback: (ctx: ReducerEventContext, room: number) => void) {
+    this.connection.offReducer("move_to_room", callback);
   }
 
   sayHello() {
@@ -119,6 +202,16 @@ export class RemoteReducers {
 }
 
 export class SetReducerFlags {
+  movePositionFlags: CallReducerFlags = 'FullUpdate';
+  movePosition(flags: CallReducerFlags) {
+    this.movePositionFlags = flags;
+  }
+
+  moveToRoomFlags: CallReducerFlags = 'FullUpdate';
+  moveToRoom(flags: CallReducerFlags) {
+    this.moveToRoomFlags = flags;
+  }
+
   sayHelloFlags: CallReducerFlags = 'FullUpdate';
   sayHello(flags: CallReducerFlags) {
     this.sayHelloFlags = flags;
@@ -129,8 +222,16 @@ export class SetReducerFlags {
 export class RemoteTables {
   constructor(private connection: DbConnectionImpl) {}
 
+  get room(): RoomTableHandle {
+    return new RoomTableHandle(this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room));
+  }
+
   get user(): UserTableHandle {
     return new UserTableHandle(this.connection.clientCache.getOrCreateTable<User>(REMOTE_MODULE.tables.user));
+  }
+
+  get userCursor(): UserCursorTableHandle {
+    return new UserCursorTableHandle(this.connection.clientCache.getOrCreateTable<UserCursor>(REMOTE_MODULE.tables.user_cursor));
   }
 }
 

@@ -4,17 +4,37 @@
 /* eslint-disable */
 /* tslint:disable */
 // @ts-nocheck
+import type {
+  CallReducerFlags,
+  DbContext,
+  ErrorContextInterface,
+  Event,
+  EventContextInterface,
+  ReducerEventContextInterface,
+  SubscriptionEventContextInterface,
+} from "@clockworklabs/spacetimedb-sdk";
 import {
   AlgebraicType,
+  AlgebraicValue,
   BinaryReader,
   BinaryWriter,
+  ConnectionId, 
+  DbConnectionBuilder,
+  DbConnectionImpl,
   Identity,
+  ProductType,
   ProductTypeElement,
+  SubscriptionBuilderImpl,
+  SumType,
+  SumTypeVariant,
+  TableCache,
+  TimeDuration,
   Timestamp,
+  deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 export type User = {
   identity: Identity,
-  name: string | undefined,
+  name: string,
   firstSeen: Timestamp,
   online: boolean,
 };
@@ -30,7 +50,7 @@ export namespace User {
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
       new ProductTypeElement("identity", AlgebraicType.createIdentityType()),
-      new ProductTypeElement("name", AlgebraicType.createOptionType(AlgebraicType.createStringType())),
+      new ProductTypeElement("name", AlgebraicType.createStringType()),
       new ProductTypeElement("firstSeen", AlgebraicType.createTimestampType()),
       new ProductTypeElement("online", AlgebraicType.createBoolType()),
     ]);

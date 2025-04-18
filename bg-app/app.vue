@@ -1,7 +1,12 @@
 <script setup lang="ts">
+import type { RouteParamsGeneric } from '#vue-router'
+import { match, P } from 'ts-pattern'
+import { useGameStore } from '~/stores/gameStore'
+
 const { setThemeName, setLocale } = usePreferencesStore()
 const { t } = useLocalizationStore()
 const { locale, themeName } = storeToRefs(usePreferencesStore())
+const router = useRouter()
 useThemeStore().init()
 useLocalizationStore().init()
 const themeIcon = ref(themeName.value === 'dark'
@@ -13,11 +18,72 @@ watch(themeName, () => {
     ? 'line-md:sunny-filled-loop-to-moon-filled-loop-transition'
     : 'line-md:moon-filled-to-sunny-filled-loop-transition'
 })
+const { moveUser, setCurrentRoomId } = useGameStore()
+const { userCursors, users } = storeToRefs(useGameStore())
+const mainNode = ref<HTMLElement>()
+const mainNodeDimensions = ref({ left: 0, top: 0, width: 0, height: 0 })
+let lastCursorPosition = { clientX: 0, clientY: 0 }
+
+function onResize(): void {
+  mainNodeDimensions.value = mainNode.value?.getBoundingClientRect() ?? { left: 0, top: 0, width: 0, height: 0 }
+}
+
+function sendCursorPosition(): void {
+  const { width, height, left, top } = mainNodeDimensions.value
+  moveUser({
+    x: (lastCursorPosition.clientX - left) / width,
+    y: (lastCursorPosition.clientY - top + window.scrollY) / height,
+  })
+}
+
+function onScroll(): void {
+  sendCursorPosition()
+}
+
+function getRoomByPath(path: string, params: RouteParamsGeneric) {
+  return match(path)
+    .with('/', () => 0)
+    .with('/impressum', () => 100)
+    .with('/about-me', () => 200)
+    .with(P.string.startsWith('/project'), () => {
+      return Number(params.id)
+    })
+    .otherwise(() => 999)
+}
+
+onMounted(() => {
+  onResize()
+  window.addEventListener('resize', onResize, true)
+  window.addEventListener('scroll', onScroll, true)
+  setCurrentRoomId(getRoomByPath(router.currentRoute.value.path, router.currentRoute.value.params))
+})
+
+watch(router.currentRoute, () => {
+  setCurrentRoomId(getRoomByPath(router.currentRoute.value.path, router.currentRoute.value.params))
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', onResize, true)
+  window.removeEventListener('scroll', onScroll, true)
+})
+
+function onMove(event: MouseEvent) {
+  lastCursorPosition = { clientX: event.clientX, clientY: event.clientY }
+  sendCursorPosition()
+}
+
+function onTouch(event: TouchEvent) {
+  lastCursorPosition = { clientX: event.touches[0].clientX, clientY: event.touches[0].clientY }
+  sendCursorPosition()
+}
 </script>
 
 <template>
   <div :key="locale" class="flex justify-center align-middle flex-wrap relative h-full">
-    <div class="main relative w-9/10">
+    <div
+      ref="mainNode" class="main relative w-9/10" @mousemove="onMove" @touchstart="onTouch" @touchmove="onTouch"
+      @touchend="onTouch"
+    >
       <div class="navbar">
         <div class="navbar-start gap-3">
           <NuxtLink to="/" aria-label="Go to main page" class="btn btn-ghost btn-circle">
@@ -28,10 +94,16 @@ watch(themeName, () => {
           </NuxtLink>
         </div>
         <div class="navbar-end gap-3">
-          <button type="button" aria-label="Switch Theme" class="btn btn-ghost btn-circle" @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')">
+          <button
+            type="button" aria-label="Switch Theme" class="btn btn-ghost btn-circle"
+            @click="() => setThemeName(themeName === 'dark' ? 'light' : 'dark')"
+          >
             <Icon size="2rem" :name="themeIcon" />
           </button>
-          <button type="button" aria-label="Switch Language" class="btn btn-ghost btn-circle" @click="() => setLocale(locale === 'en' ? 'de' : 'en')">
+          <button
+            type="button" aria-label="Switch Language" class="btn btn-ghost btn-circle"
+            @click="() => setLocale(locale === 'en' ? 'de' : 'en')"
+          >
             {{ locale }}
           </button>
         </div>
@@ -60,14 +132,91 @@ watch(themeName, () => {
           <p>© {{ new Date().getFullYear() }} - {{ t('allRightsReserved') }}</p>
         </aside>
       </div>
+      <div class="cursors">
+        <div
+          v-for="(cursor, id) in userCursors" :key="id"
+          class="cursor"
+          :class="users[id].colorClass"
+          :style="{ left: `${Math.round(cursor.position.x * mainNodeDimensions.width)}px`, top: `${Math.round(cursor.position.y * mainNodeDimensions.height)}px` }"
+        >
+          <Icon
+            class="cursor-icon"
+            name="line-md:account-small"
+            size="2rem"
+          />
+          <span class="cursor-name">{{ users[id].name }}</span>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <style>
+.cursors {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.cursor {
+  position: absolute;
+  filter: drop-shadow(0px 0px 3px var(--color-base-200));
+}
+
+.col-1 {
+  color: #cb5352
+}
+
+.col-2 {
+  color: #64ac48
+}
+
+.col-3 {
+  color: #8f62ca
+}
+
+.col-4 {
+  color: #9a963f
+}
+
+.col-5 {
+  color: #6b8bcd
+}
+
+.col-6 {
+  color: #c97f3e
+}
+
+.col-7 {
+  color: #4aac8d
+}
+
+.col-8 {
+  color: #c75d9c
+}
+
+.cursor-icon {
+  position: absolute;
+}
+
+.cursor-name {
+  position: absolute;
+  top: 20px;
+  left: 30px;
+  font-size: 10px;
+  font-weight: bold;
+}
+
 .main {
+  position: relative;
   max-width: 1080px;
 }
+
 .bg-footer {
   margin-top: 2em;
 }

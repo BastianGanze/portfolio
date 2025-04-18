@@ -1,0 +1,1 @@
+ ~/.local/bin/spacetime logs tic-tac-toe

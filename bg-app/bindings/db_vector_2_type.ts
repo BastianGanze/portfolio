@@ -32,29 +32,34 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
-
-export type UserConnected = {};
+export type DbVector2 = {
+  x: number,
+  y: number,
+};
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace UserConnected {
+export namespace DbVector2 {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
+      new ProductTypeElement("x", AlgebraicType.createF32Type()),
+      new ProductTypeElement("y", AlgebraicType.createF32Type()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: UserConnected): void {
-    UserConnected.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: DbVector2): void {
+    DbVector2.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): UserConnected {
-    return UserConnected.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): DbVector2 {
+    return DbVector2.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }
+
 

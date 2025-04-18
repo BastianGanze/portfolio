@@ -33,27 +33,30 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 
-export type UserConnected = {};
+export type MoveToRoom = {
+  room: number,
+};
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace UserConnected {
+export namespace MoveToRoom {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
+      new ProductTypeElement("room", AlgebraicType.createU32Type()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: UserConnected): void {
-    UserConnected.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: MoveToRoom): void {
+    MoveToRoom.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): UserConnected {
-    return UserConnected.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): MoveToRoom {
+    return MoveToRoom.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

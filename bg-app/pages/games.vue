@@ -2,7 +2,8 @@
 import { useGameStore } from '~/stores/gameStore'
 
 const { t } = useLocalizationStore()
-const { connected } = useGameStore()
+
+const { connected } = storeToRefs(useGameStore())
 </script>
 
 <template>
