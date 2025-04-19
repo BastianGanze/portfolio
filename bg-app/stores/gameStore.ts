@@ -1,5 +1,7 @@
+// noinspection SqlNoDataSourceInspection
+
 import type { Identity } from '@clockworklabs/spacetimedb-sdk'
-import type { DbVector2, ErrorContext, Room, User, UserCursor } from '~/bindings'
+import type { DbBoardGameMove, DbVector2, ErrorContext, Room, User, UserCursor, VersusGameInstance } from '~/bindings'
 import { DbConnection } from '~/bindings'
 
 export const useGameStore = defineStore('gameStore', () => {
@@ -10,6 +12,7 @@ export const useGameStore = defineStore('gameStore', () => {
   let dbConn: DbConnection | null = null
   const authToken = useCookie<string>('gameAuthToken', { default: () => '' })
   const rooms = ref<Record<number, Room>>({})
+  const gameInstances = ref<Record<number, VersusGameInstance>>({})
   let currentRoomId = 0
   let cursorSubscription: null | { unsubscribe: () => void } = null
 
@@ -23,6 +26,13 @@ export const useGameStore = defineStore('gameStore', () => {
   let moveUser = (_pos: DbVector2) => {
   }
   let setCurrentRoomId = (_id: number) => {
+  }
+  let createVersusGameInstance = () => {
+  }
+  let makeRandomBoardGameMove = (_instanceId: number) => {
+  }
+
+  let makeBoardGameMove = (_instanceId: number, _boardGameMove: DbBoardGameMove) => {
   }
   if (import.meta.client) {
     const subToRoom = (roomId: number) => {
@@ -47,6 +57,9 @@ export const useGameStore = defineStore('gameStore', () => {
       conn
         ?.subscriptionBuilder()
         .subscribe('SELECT * FROM room')
+      conn
+        ?.subscriptionBuilder()
+        .subscribe('SELECT * FROM versus_game_instance')
       subToRoom(currentRoomId)
     }
 
@@ -119,6 +132,14 @@ export const useGameStore = defineStore('gameStore', () => {
       rooms.value[newRow.id] = newRow
     })
 
+    dbConn.db.versusGameInstance.onInsert((_ctx, newRow) => {
+      gameInstances.value[newRow.id] = newRow
+    })
+
+    dbConn.db.versusGameInstance.onUpdate((_ctx, _oldRow, newRow) => {
+      gameInstances.value[newRow.id] = newRow
+    })
+
     moveUser = (pos: DbVector2) => {
       dbConn!.reducers.movePosition(pos)
     }
@@ -129,6 +150,18 @@ export const useGameStore = defineStore('gameStore', () => {
       subToRoom(currentRoomId)
       userCursors.value = {}
     }
+
+    createVersusGameInstance = () => {
+      dbConn!.reducers.createGameInstance({ tag: 'TicTacToe' })
+    }
+
+    makeRandomBoardGameMove = (instanceId: number) => {
+      dbConn!.reducers.makeRandomBoardGameMove(instanceId)
+    }
+
+    makeBoardGameMove = (instanceId: number, boardGameMove: DbBoardGameMove) => {
+      dbConn!.reducers.makeBoardGameMove(instanceId, boardGameMove)
+    }
   }
   return {
     connected,
@@ -137,5 +170,9 @@ export const useGameStore = defineStore('gameStore', () => {
     users,
     rooms,
     setCurrentRoomId,
+    createVersusGameInstance,
+    makeRandomBoardGameMove,
+    makeBoardGameMove,
+    gameInstances,
   }
 })

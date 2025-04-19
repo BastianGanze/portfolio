@@ -18,8 +18,8 @@ watch(themeName, () => {
     ? 'line-md:sunny-filled-loop-to-moon-filled-loop-transition'
     : 'line-md:moon-filled-to-sunny-filled-loop-transition'
 })
-const { moveUser, setCurrentRoomId } = useGameStore()
-const { userCursors, users } = storeToRefs(useGameStore())
+const { moveUser, setCurrentRoomId, createVersusGameInstance } = useGameStore()
+const { userCursors, users, gameInstances } = storeToRefs(useGameStore())
 const mainNode = ref<HTMLElement>()
 const mainNodeDimensions = ref({ left: 0, top: 0, width: 0, height: 0 })
 let lastCursorPosition = { clientX: 0, clientY: 0 }
@@ -84,6 +84,14 @@ function onTouch(event: TouchEvent) {
       ref="mainNode" class="main relative w-9/10" @mousemove="onMove" @touchstart="onTouch" @touchmove="onTouch"
       @touchend="onTouch"
     >
+      <div>
+        <button class="btn" @click="createVersusGameInstance">
+          Create
+        </button>
+        <div v-for="(instance, id) in gameInstances" :key="id">
+          <GameBoard :instance="instance" />
+        </div>
+      </div>
       <div class="navbar">
         <div class="navbar-start gap-3">
           <NuxtLink to="/" aria-label="Go to main page" class="btn btn-ghost btn-circle">
@@ -151,6 +159,7 @@ function onTouch(event: TouchEvent) {
   </div>
 </template>
 
+<!-- suppress CssUnusedSymbol -->
 <style>
 .cursors {
   position: absolute;

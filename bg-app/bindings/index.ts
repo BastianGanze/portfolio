@@ -34,8 +34,14 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 
 // Import and reexport all reducer arg types
+import { CreateGameInstance } from "./create_game_instance_reducer.ts";
+export { CreateGameInstance };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
+import { MakeBoardGameMove } from "./make_board_game_move_reducer.ts";
+export { MakeBoardGameMove };
+import { MakeRandomBoardGameMove } from "./make_random_board_game_move_reducer.ts";
+export { MakeRandomBoardGameMove };
 import { MovePosition } from "./move_position_reducer.ts";
 export { MovePosition };
 import { MoveToRoom } from "./move_to_room_reducer.ts";
@@ -52,16 +58,34 @@ import { UserTableHandle } from "./user_table.ts";
 export { UserTableHandle };
 import { UserCursorTableHandle } from "./user_cursor_table.ts";
 export { UserCursorTableHandle };
+import { VersusGameInstanceTableHandle } from "./versus_game_instance_table.ts";
+export { VersusGameInstanceTableHandle };
 
 // Import and reexport all types
+import { Coord } from "./coord_type.ts";
+export { Coord };
+import { DbBoardGame } from "./db_board_game_type.ts";
+export { DbBoardGame };
+import { DbBoardGameMove } from "./db_board_game_move_type.ts";
+export { DbBoardGameMove };
+import { DbBoardGameParam } from "./db_board_game_param_type.ts";
+export { DbBoardGameParam };
 import { DbVector2 } from "./db_vector_2_type.ts";
 export { DbVector2 };
+import { Outcome } from "./outcome_type.ts";
+export { Outcome };
+import { Player } from "./player_type.ts";
+export { Player };
 import { Room } from "./room_type.ts";
 export { Room };
+import { TttBoard } from "./ttt_board_type.ts";
+export { TttBoard };
 import { User } from "./user_type.ts";
 export { User };
 import { UserCursor } from "./user_cursor_type.ts";
 export { UserCursor };
+import { VersusGameInstance } from "./versus_game_instance_type.ts";
+export { VersusGameInstance };
 
 const REMOTE_MODULE = {
   tables: {
@@ -80,11 +104,28 @@ const REMOTE_MODULE = {
       rowType: UserCursor.getTypeScriptAlgebraicType(),
       primaryKey: "identity",
     },
+    versus_game_instance: {
+      tableName: "versus_game_instance",
+      rowType: VersusGameInstance.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
+    },
   },
   reducers: {
+    create_game_instance: {
+      reducerName: "create_game_instance",
+      argsType: CreateGameInstance.getTypeScriptAlgebraicType(),
+    },
     identity_disconnected: {
       reducerName: "identity_disconnected",
       argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
+    },
+    make_board_game_move: {
+      reducerName: "make_board_game_move",
+      argsType: MakeBoardGameMove.getTypeScriptAlgebraicType(),
+    },
+    make_random_board_game_move: {
+      reducerName: "make_random_board_game_move",
+      argsType: MakeRandomBoardGameMove.getTypeScriptAlgebraicType(),
     },
     move_position: {
       reducerName: "move_position",
@@ -129,7 +170,10 @@ const REMOTE_MODULE = {
 
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
+| { name: "CreateGameInstance", args: CreateGameInstance }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
+| { name: "MakeBoardGameMove", args: MakeBoardGameMove }
+| { name: "MakeRandomBoardGameMove", args: MakeRandomBoardGameMove }
 | { name: "MovePosition", args: MovePosition }
 | { name: "MoveToRoom", args: MoveToRoom }
 | { name: "SayHello", args: SayHello }
@@ -139,12 +183,60 @@ export type Reducer = never
 export class RemoteReducers {
   constructor(private connection: DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
 
+  createGameInstance(gameParam: DbBoardGameParam) {
+    const __args = { gameParam };
+    let __writer = new BinaryWriter(1024);
+    CreateGameInstance.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("create_game_instance", __argsBuffer, this.setCallReducerFlags.createGameInstanceFlags);
+  }
+
+  onCreateGameInstance(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
+    this.connection.onReducer("create_game_instance", callback);
+  }
+
+  removeOnCreateGameInstance(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
+    this.connection.offReducer("create_game_instance", callback);
+  }
+
   onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.onReducer("identity_disconnected", callback);
   }
 
   removeOnIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("identity_disconnected", callback);
+  }
+
+  makeBoardGameMove(gameInstanceId: number, mv: DbBoardGameMove) {
+    const __args = { gameInstanceId, mv };
+    let __writer = new BinaryWriter(1024);
+    MakeBoardGameMove.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("make_board_game_move", __argsBuffer, this.setCallReducerFlags.makeBoardGameMoveFlags);
+  }
+
+  onMakeBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number, mv: DbBoardGameMove) => void) {
+    this.connection.onReducer("make_board_game_move", callback);
+  }
+
+  removeOnMakeBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number, mv: DbBoardGameMove) => void) {
+    this.connection.offReducer("make_board_game_move", callback);
+  }
+
+  makeRandomBoardGameMove(gameInstanceId: number) {
+    const __args = { gameInstanceId };
+    let __writer = new BinaryWriter(1024);
+    MakeRandomBoardGameMove.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("make_random_board_game_move", __argsBuffer, this.setCallReducerFlags.makeRandomBoardGameMoveFlags);
+  }
+
+  onMakeRandomBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number) => void) {
+    this.connection.onReducer("make_random_board_game_move", callback);
+  }
+
+  removeOnMakeRandomBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number) => void) {
+    this.connection.offReducer("make_random_board_game_move", callback);
   }
 
   movePosition(position: DbVector2) {
@@ -202,6 +294,21 @@ export class RemoteReducers {
 }
 
 export class SetReducerFlags {
+  createGameInstanceFlags: CallReducerFlags = 'FullUpdate';
+  createGameInstance(flags: CallReducerFlags) {
+    this.createGameInstanceFlags = flags;
+  }
+
+  makeBoardGameMoveFlags: CallReducerFlags = 'FullUpdate';
+  makeBoardGameMove(flags: CallReducerFlags) {
+    this.makeBoardGameMoveFlags = flags;
+  }
+
+  makeRandomBoardGameMoveFlags: CallReducerFlags = 'FullUpdate';
+  makeRandomBoardGameMove(flags: CallReducerFlags) {
+    this.makeRandomBoardGameMoveFlags = flags;
+  }
+
   movePositionFlags: CallReducerFlags = 'FullUpdate';
   movePosition(flags: CallReducerFlags) {
     this.movePositionFlags = flags;
@@ -232,6 +339,10 @@ export class RemoteTables {
 
   get userCursor(): UserCursorTableHandle {
     return new UserCursorTableHandle(this.connection.clientCache.getOrCreateTable<UserCursor>(REMOTE_MODULE.tables.user_cursor));
+  }
+
+  get versusGameInstance(): VersusGameInstanceTableHandle {
+    return new VersusGameInstanceTableHandle(this.connection.clientCache.getOrCreateTable<VersusGameInstance>(REMOTE_MODULE.tables.versus_game_instance));
   }
 }
 

@@ -32,40 +32,36 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
-export type User = {
-  identity: Identity,
-  name: string,
-  firstSeen: Timestamp,
-  online: boolean,
-  gameInstanceId: number | undefined,
+
+import { DbBoardGameMove as __DbBoardGameMove } from "./db_board_game_move_type";
+
+export type MakeBoardGameMove = {
+  gameInstanceId: number,
+  mv: __DbBoardGameMove,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace User {
+export namespace MakeBoardGameMove {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("identity", AlgebraicType.createIdentityType()),
-      new ProductTypeElement("name", AlgebraicType.createStringType()),
-      new ProductTypeElement("firstSeen", AlgebraicType.createTimestampType()),
-      new ProductTypeElement("online", AlgebraicType.createBoolType()),
-      new ProductTypeElement("gameInstanceId", AlgebraicType.createOptionType(AlgebraicType.createU32Type())),
+      new ProductTypeElement("gameInstanceId", AlgebraicType.createU32Type()),
+      new ProductTypeElement("mv", __DbBoardGameMove.getTypeScriptAlgebraicType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: User): void {
-    User.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: MakeBoardGameMove): void {
+    MakeBoardGameMove.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): User {
-    return User.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): MakeBoardGameMove {
+    return MakeBoardGameMove.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }
-
 

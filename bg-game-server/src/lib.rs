@@ -1,16 +1,15 @@
+pub mod board_games;
 pub mod math;
 
+use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
+use board_game::board::Board;
+use board_games::DbBoardGame;
 use math::DbVector2;
 use spacetimedb::{reducer, table, Identity, ReducerContext, Table, Timestamp};
 
 pub type RoomId = u32;
 pub const LOBBY_ROOM: RoomId = 0;
-pub const PAST_ROOM: RoomId = 1;
-pub const FOXBASE_ROOM: RoomId = 2;
-pub const ITSMYCARGO_ROOM: RoomId = 3;
-pub const ATSUME_ROOM: RoomId = 4;
-pub const SHIKU_ROOM: RoomId = 5;
-pub const PORTFOLIO_ROOM: RoomId = 6;
+pub type GameInstanceId = u32;
 
 #[table(name = user, public)]
 pub struct User {
@@ -19,6 +18,17 @@ pub struct User {
     name: String,
     first_seen: Timestamp,
     online: bool,
+    game_instance_id: Option<GameInstanceId>,
+}
+
+#[table(name = versus_game_instance, public)]
+pub struct VersusGameInstance {
+    #[primary_key]
+    #[auto_inc]
+    id: GameInstanceId,
+    player_one: Option<Identity>,
+    player_two: Option<Identity>,
+    game_state: DbBoardGame,
 }
 
 #[table(name = room, public)]
@@ -71,24 +81,24 @@ pub fn remove_user_from_room(ctx: &ReducerContext, room_id: RoomId) {
 
 #[reducer(client_connected)]
 pub fn user_connected(ctx: &ReducerContext) {
+    ctx.db.user_cursor().insert(UserCursor {
+        identity: ctx.sender,
+        room: LOBBY_ROOM,
+        position: DbVector2 { x: 0.0, y: 0.0 },
+    });
+    add_user_to_room(ctx, LOBBY_ROOM);
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
-        add_user_to_room(ctx, LOBBY_ROOM);
         ctx.db.user().identity().update(User {
             online: true,
             ..user
         });
     } else {
-        add_user_to_room(ctx, LOBBY_ROOM);
-        ctx.db.user_cursor().insert(UserCursor {
-            identity: ctx.sender,
-            room: LOBBY_ROOM,
-            position: DbVector2 { x: 0.0, y: 0.0 },
-        });
         ctx.db.user().insert(User {
             name: "Test".into(),
             identity: ctx.sender,
             first_seen: ctx.timestamp,
             online: true,
+            game_instance_id: None,
         });
     }
 }
@@ -153,4 +163,79 @@ pub fn move_to_room(ctx: &ReducerContext, room: RoomId) -> Result<(), String> {
         ..user_cursor
     });
     Ok(())
+}
+
+#[reducer]
+pub fn create_game_instance(ctx: &ReducerContext, game_param: DbBoardGameParam) {
+    if let Err(err) = ctx
+        .db
+        .versus_game_instance()
+        .try_insert(VersusGameInstance {
+            id: 0,
+            game_state: DbBoardGame::from(game_param),
+            player_one: Some(ctx.sender),
+            player_two: None,
+        })
+    {
+        log::error!("{:?}", err);
+    }
+}
+
+#[reducer]
+pub fn make_board_game_move(
+    ctx: &ReducerContext,
+    game_instance_id: GameInstanceId,
+    mv: DbBoardGameMove,
+) {
+    if let Some(game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
+        match game_instance.game_state {
+            DbBoardGame::TicTacToe(mut board) => {
+                if let DbBoardGameMove::TicTacToe(ttt_move) = mv {
+                    match board.play(ttt_move) {
+                        Ok(()) => {
+                            ctx.db
+                                .versus_game_instance()
+                                .id()
+                                .update(VersusGameInstance {
+                                    game_state: DbBoardGame::TicTacToe(board),
+                                    ..game_instance
+                                });
+                        }
+                        Err(err) => {
+                            log::error!("Could not make move! {:?}", err);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+#[reducer]
+pub fn make_random_board_game_move(ctx: &ReducerContext, game_instance_id: GameInstanceId) {
+    if let Some(game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
+        match game_instance.game_state {
+            DbBoardGame::TicTacToe(mut board) => {
+                match board.random_available_move(&mut ctx.rng()) {
+                    Ok(mv) => match board.play(mv) {
+                        Ok(()) => {
+                            ctx.db
+                                .versus_game_instance()
+                                .id()
+                                .update(VersusGameInstance {
+                                    game_state: DbBoardGame::TicTacToe(board),
+                                    ..game_instance
+                                });
+                        }
+                        Err(err) => {
+                            log::error!("Could not make move! {:?}", err);
+                        }
+                    },
+                    Err(_) => {
+                        log::error!("Board done, could not make move!");
+                    }
+                }
+            }
+        }
+    }
 }
