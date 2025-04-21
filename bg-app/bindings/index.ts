@@ -34,6 +34,8 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 
 // Import and reexport all reducer arg types
+import { AbandonGame } from "./abandon_game_reducer.ts";
+export { AbandonGame };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
 import { JoinRandomGame } from "./join_random_game_reducer.ts";
@@ -124,6 +126,10 @@ const REMOTE_MODULE = {
     },
   },
   reducers: {
+    abandon_game: {
+      reducerName: "abandon_game",
+      argsType: AbandonGame.getTypeScriptAlgebraicType(),
+    },
     identity_disconnected: {
       reducerName: "identity_disconnected",
       argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
@@ -187,6 +193,7 @@ const REMOTE_MODULE = {
 
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
+| { name: "AbandonGame", args: AbandonGame }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "JoinRandomGame", args: JoinRandomGame }
 | { name: "MakeBoardGameMove", args: MakeBoardGameMove }
@@ -200,6 +207,18 @@ export type Reducer = never
 
 export class RemoteReducers {
   constructor(private connection: DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
+
+  abandonGame() {
+    this.connection.callReducer("abandon_game", new Uint8Array(0), this.setCallReducerFlags.abandonGameFlags);
+  }
+
+  onAbandonGame(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.onReducer("abandon_game", callback);
+  }
+
+  removeOnAbandonGame(callback: (ctx: ReducerEventContext) => void) {
+    this.connection.offReducer("abandon_game", callback);
+  }
 
   onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.onReducer("identity_disconnected", callback);
@@ -328,6 +347,11 @@ export class RemoteReducers {
 }
 
 export class SetReducerFlags {
+  abandonGameFlags: CallReducerFlags = 'FullUpdate';
+  abandonGame(flags: CallReducerFlags) {
+    this.abandonGameFlags = flags;
+  }
+
   joinRandomGameFlags: CallReducerFlags = 'FullUpdate';
   joinRandomGame(flags: CallReducerFlags) {
     this.joinRandomGameFlags = flags;

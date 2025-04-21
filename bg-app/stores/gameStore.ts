@@ -40,8 +40,10 @@ export const useGameStore = defineStore('gameStore', () => {
   }
   let makeRandomBoardGameMove = (_instanceId: number) => {
   }
-
   let makeBoardGameMove = (_instanceId: number, _boardGameMove: DbBoardGameMove) => {
+  }
+
+  let abandonGame = () => {
   }
   if (import.meta.client) {
     const subToRoom = (roomId: number) => {
@@ -84,7 +86,7 @@ export const useGameStore = defineStore('gameStore', () => {
         .onConnect(onConnect)
         .onDisconnect(onDisconnect)
         .onConnectError((_ctx: ErrorContext, err: Error) => {
-          if (err.message.includes('Unauthorized')) {
+          if (err.message?.includes('Unauthorized')) {
             authToken.value = ''
             connectDb()
           }
@@ -148,7 +150,6 @@ export const useGameStore = defineStore('gameStore', () => {
       })
 
       dbConn.db.versusGameInstance.onInsert((_ctx, newRow) => {
-        console.log('onInsert', newRow)
         gameInstances.value[newRow.id] = newRow
       })
 
@@ -193,6 +194,13 @@ export const useGameStore = defineStore('gameStore', () => {
         }
         dbConn!.reducers.makeBoardGameMove(instanceId, boardGameMove)
       }
+
+      abandonGame = () => {
+        if (!connected.value) {
+          return
+        }
+        dbConn!.reducers.abandonGame()
+      }
     }
     connectDb()
   }
@@ -206,6 +214,7 @@ export const useGameStore = defineStore('gameStore', () => {
     joinRandomGame,
     makeRandomBoardGameMove,
     makeBoardGameMove,
+    abandonGame,
     gameInstances,
     currentUserId,
   }

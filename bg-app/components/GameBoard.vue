@@ -31,7 +31,10 @@ const bothPlayersAvailable = computed(() => {
 
 <template>
   <div v-if="instance && currentUserPlayer">
-    <div v-if="!instance.outcome && bothPlayersAvailable">
+    <div v-if="!instance.outcome && instance.gameDone">
+      Game abandoned.
+    </div>
+    <div v-if="!instance.outcome && !instance.gameDone && bothPlayersAvailable">
       {{ instance.nextPlayer.tag === currentUserPlayer.tag ? 'Your turn!' : 'Opponents turn...' }}
     </div>
     <div v-if="instance.outcome">

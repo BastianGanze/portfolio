@@ -8,6 +8,7 @@ const props = defineProps<{
   currentUserId: string
 }>()
 const { boardGameParam, gameInstances, currentUserId } = toRefs(props)
+const { users } = storeToRefs(useGameStore())
 
 const activeInstanceId = ref<number | null>(null)
 const activeInstance = computed(() => {
@@ -38,25 +39,55 @@ const canAddBot = computed(() => {
   return false
 })
 
-const { joinRandomGame } = useGameStore()
+const { joinRandomGame, abandonGame } = useGameStore()
 
 function joinGame() {
   activeInstanceId.value = null
   seekRunningGame.value = true
   joinRandomGame(boardGameParam.value)
 }
+
+const opposingUserIdentity = computed(() => {
+  if (!activeInstance.value || !activeInstance.value.playerOne || !activeInstance.value.playerTwo) {
+    return null
+  }
+  if (activeInstance.value.playerOne.toHexString() === currentUserId.value) {
+    return activeInstance.value.playerTwo
+  }
+  if (activeInstance.value.playerTwo.toHexString() === currentUserId.value) {
+    return activeInstance.value.playerOne
+  }
+  return null
+})
+const opposingUser = computed(() => {
+  return opposingUserIdentity.value ? users.value[opposingUserIdentity.value.toHexString()] ?? null : null
+})
 </script>
 
 <template>
   <div>
-    <button v-if="!activeInstance" class="btn" @click="joinGame">
+    <div v-if="activeInstance">
+      <div
+        v-if="opposingUserIdentity && (!opposingUser || (opposingUser && !opposingUser.online)) && !activeInstance.gameDone"
+      >
+        <div class="text-red-500">
+          The opponent is offline! You can wait for them to come back or join another game, but there will be no winner
+          or
+          looser in this game.
+        </div>
+        <button class="btn" @click="abandonGame">
+          Abandon game
+        </button>
+      </div>
+      <button
+        v-else-if="activeInstance.gameDone" class="btn"
+        @click="joinGame"
+      >
+        Play again
+      </button>
+    </div>
+    <button v-else class="btn" @click="joinGame">
       Join game
-    </button>
-    <button
-      v-else-if="activeInstance && activeInstance.gameDone" class="btn"
-      @click="joinGame"
-    >
-      Play again
     </button>
     <button
       v-if="canAddBot" class="btn"

@@ -145,15 +145,22 @@ pub fn remove_user_from_room(ctx: &ReducerContext, room_id: RoomId) {
 
 #[reducer(client_connected)]
 pub fn user_connected(ctx: &ReducerContext) {
-    ctx.db.user_cursor().insert(UserCursor {
-        identity: ctx.sender,
-        room: LOBBY_ROOM,
-        position: DbVector2 { x: 0.0, y: 0.0 },
-    });
-    add_user_to_room(ctx, LOBBY_ROOM);
+    if ctx
+        .db
+        .user_cursor()
+        .try_insert(UserCursor {
+            identity: ctx.sender,
+            room: LOBBY_ROOM,
+            position: DbVector2 { x: 0.0, y: 0.0 },
+        })
+        .is_ok()
+    {
+        add_user_to_room(ctx, LOBBY_ROOM);
+    }
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         ctx.db.user().identity().update(User {
             connected: true,
+            online: true,
             ..user
         });
     } else {
@@ -185,8 +192,8 @@ pub fn identity_disconnected(ctx: &ReducerContext) {
             connected: false,
             ..user
         });
-        let thirty_seconds = TimeDuration::from_micros(30_000_000);
-        let future_timestamp: Timestamp = ctx.timestamp + thirty_seconds;
+        let fifteen_seconds = TimeDuration::from_micros(15_000_000);
+        let future_timestamp: Timestamp = ctx.timestamp + fifteen_seconds;
         ctx.db.timeout_user_schedule().insert(TimeoutUserSchedule {
             scheduled_id: 0,
             player_identity: ctx.sender,
@@ -446,6 +453,29 @@ pub fn find_free_game_instance(
             && (instance.player_one.is_none() || instance.player_two.is_none())
             && instance.game_state_param == game_param
     })
+}
+
+pub fn find_current_players_running_game_instance(
+    ctx: &ReducerContext,
+) -> Option<VersusGameInstance> {
+    ctx.db.versus_game_instance().iter().find(|instance| {
+        (instance.player_one == Some(ctx.sender) || instance.player_two == Some(ctx.sender))
+            && instance.outcome.is_none()
+            && !instance.game_done
+    })
+}
+
+#[reducer]
+pub fn abandon_game(ctx: &ReducerContext) {
+    if let Some(current_game_instance) = find_current_players_running_game_instance(ctx) {
+        ctx.db
+            .versus_game_instance()
+            .id()
+            .update(VersusGameInstance {
+                game_done: true,
+                ..current_game_instance
+            });
+    }
 }
 
 #[reducer]
