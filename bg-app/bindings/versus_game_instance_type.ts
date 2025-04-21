@@ -32,12 +32,15 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
+import { DbBoardGameParam as __DbBoardGameParam } from "./db_board_game_param_type";
 import { DbBoardGame as __DbBoardGame } from "./db_board_game_type";
 
 export type VersusGameInstance = {
   id: number,
   playerOne: Identity | undefined,
   playerTwo: Identity | undefined,
+  gameDone: boolean,
+  gameStateParam: __DbBoardGameParam,
   gameState: __DbBoardGame,
 };
 
@@ -54,6 +57,8 @@ export namespace VersusGameInstance {
       new ProductTypeElement("id", AlgebraicType.createU32Type()),
       new ProductTypeElement("playerOne", AlgebraicType.createOptionType(AlgebraicType.createIdentityType())),
       new ProductTypeElement("playerTwo", AlgebraicType.createOptionType(AlgebraicType.createIdentityType())),
+      new ProductTypeElement("gameDone", AlgebraicType.createBoolType()),
+      new ProductTypeElement("gameStateParam", __DbBoardGameParam.getTypeScriptAlgebraicType()),
       new ProductTypeElement("gameState", __DbBoardGame.getTypeScriptAlgebraicType()),
     ]);
   }

@@ -34,10 +34,10 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 
 // Import and reexport all reducer arg types
-import { CreateGameInstance } from "./create_game_instance_reducer.ts";
-export { CreateGameInstance };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
+import { JoinRandomGame } from "./join_random_game_reducer.ts";
+export { JoinRandomGame };
 import { MakeBoardGameMove } from "./make_board_game_move_reducer.ts";
 export { MakeBoardGameMove };
 import { MakeRandomBoardGameMove } from "./make_random_board_game_move_reducer.ts";
@@ -111,13 +111,13 @@ const REMOTE_MODULE = {
     },
   },
   reducers: {
-    create_game_instance: {
-      reducerName: "create_game_instance",
-      argsType: CreateGameInstance.getTypeScriptAlgebraicType(),
-    },
     identity_disconnected: {
       reducerName: "identity_disconnected",
       argsType: IdentityDisconnected.getTypeScriptAlgebraicType(),
+    },
+    join_random_game: {
+      reducerName: "join_random_game",
+      argsType: JoinRandomGame.getTypeScriptAlgebraicType(),
     },
     make_board_game_move: {
       reducerName: "make_board_game_move",
@@ -170,8 +170,8 @@ const REMOTE_MODULE = {
 
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
-| { name: "CreateGameInstance", args: CreateGameInstance }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
+| { name: "JoinRandomGame", args: JoinRandomGame }
 | { name: "MakeBoardGameMove", args: MakeBoardGameMove }
 | { name: "MakeRandomBoardGameMove", args: MakeRandomBoardGameMove }
 | { name: "MovePosition", args: MovePosition }
@@ -183,28 +183,28 @@ export type Reducer = never
 export class RemoteReducers {
   constructor(private connection: DbConnectionImpl, private setCallReducerFlags: SetReducerFlags) {}
 
-  createGameInstance(gameParam: DbBoardGameParam) {
-    const __args = { gameParam };
-    let __writer = new BinaryWriter(1024);
-    CreateGameInstance.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("create_game_instance", __argsBuffer, this.setCallReducerFlags.createGameInstanceFlags);
-  }
-
-  onCreateGameInstance(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
-    this.connection.onReducer("create_game_instance", callback);
-  }
-
-  removeOnCreateGameInstance(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
-    this.connection.offReducer("create_game_instance", callback);
-  }
-
   onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.onReducer("identity_disconnected", callback);
   }
 
   removeOnIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("identity_disconnected", callback);
+  }
+
+  joinRandomGame(gameParam: DbBoardGameParam) {
+    const __args = { gameParam };
+    let __writer = new BinaryWriter(1024);
+    JoinRandomGame.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("join_random_game", __argsBuffer, this.setCallReducerFlags.joinRandomGameFlags);
+  }
+
+  onJoinRandomGame(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
+    this.connection.onReducer("join_random_game", callback);
+  }
+
+  removeOnJoinRandomGame(callback: (ctx: ReducerEventContext, gameParam: DbBoardGameParam) => void) {
+    this.connection.offReducer("join_random_game", callback);
   }
 
   makeBoardGameMove(gameInstanceId: number, mv: DbBoardGameMove) {
@@ -294,9 +294,9 @@ export class RemoteReducers {
 }
 
 export class SetReducerFlags {
-  createGameInstanceFlags: CallReducerFlags = 'FullUpdate';
-  createGameInstance(flags: CallReducerFlags) {
-    this.createGameInstanceFlags = flags;
+  joinRandomGameFlags: CallReducerFlags = 'FullUpdate';
+  joinRandomGame(flags: CallReducerFlags) {
+    this.joinRandomGameFlags = flags;
   }
 
   makeBoardGameMoveFlags: CallReducerFlags = 'FullUpdate';

@@ -35,14 +35,14 @@ import {
 
 import { DbBoardGameParam as __DbBoardGameParam } from "./db_board_game_param_type";
 
-export type CreateGameInstance = {
+export type JoinRandomGame = {
   gameParam: __DbBoardGameParam,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace CreateGameInstance {
+export namespace JoinRandomGame {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
@@ -53,12 +53,12 @@ export namespace CreateGameInstance {
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: CreateGameInstance): void {
-    CreateGameInstance.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: JoinRandomGame): void {
+    JoinRandomGame.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): CreateGameInstance {
-    return CreateGameInstance.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): JoinRandomGame {
+    return JoinRandomGame.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

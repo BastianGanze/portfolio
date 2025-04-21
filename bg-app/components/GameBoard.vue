@@ -1,11 +1,15 @@
 <script setup lang="ts">
 import type { VersusGameInstance } from '~/bindings'
+import { useGameStore } from '~/stores/gameStore'
 
-const props = defineProps<{ instance: VersusGameInstance }>()
+const props = defineProps<{ instance: VersusGameInstance, currentUserId: string }>()
 const { instance } = toRefs(props)
 const { makeBoardGameMove } = useGameStore()
 
 function ticTacToeMove(index: number) {
+  if (instance.value.playerOne && instance.value.playerTwo) {
+    return
+  }
   makeBoardGameMove(instance.value.id, { tag: 'TicTacToe', value: { index } })
 }
 </script>
@@ -15,7 +19,7 @@ function ticTacToeMove(index: number) {
     <div v-if="instance.gameState.tag === 'TicTacToe'" class="tic-tac-toe-board">
       <div
         v-for="(player, i) in instance.gameState.value.tiles" :key="i" class="tic-tac-toe-cell"
-        @click="ticTacToeMove(i)"
+        @click="() => !player && ticTacToeMove(i)"
       >
         <SvgCrossPreventAnimationCaching v-if="player?.tag === 'A'" />
         <SvgCirclePreventAnimationCaching v-else-if="player?.tag === 'B'" />

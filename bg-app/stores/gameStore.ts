@@ -1,12 +1,21 @@
 // noinspection SqlNoDataSourceInspection
 
 import type { Identity } from '@clockworklabs/spacetimedb-sdk'
-import type { DbBoardGameMove, DbVector2, ErrorContext, Room, User, UserCursor, VersusGameInstance } from '~/bindings'
+import type {
+  DbBoardGameMove,
+  DbBoardGameParam,
+  DbVector2,
+  ErrorContext,
+  Room,
+  User,
+  UserCursor,
+  VersusGameInstance,
+} from '~/bindings'
 import { DbConnection } from '~/bindings'
 
 export const useGameStore = defineStore('gameStore', () => {
   const connected = ref(false)
-  let currentUserId: string | null = null
+  const currentUserId = ref<string | null>(null)
   const users = ref<Record<string, User & { colorClass: string }>>({})
   const userCursors = ref<{ [key: string]: UserCursor }>({})
   let dbConn: DbConnection | null = null
@@ -27,7 +36,7 @@ export const useGameStore = defineStore('gameStore', () => {
   }
   let setCurrentRoomId = (_id: number) => {
   }
-  let createVersusGameInstance = () => {
+  let joinRandomGame = (_gameParam: DbBoardGameParam) => {
   }
   let makeRandomBoardGameMove = (_instanceId: number) => {
   }
@@ -48,7 +57,7 @@ export const useGameStore = defineStore('gameStore', () => {
       id: Identity,
       token: string,
     ) => {
-      currentUserId = id.toHexString()
+      currentUserId.value = id.toHexString()
       connected.value = true
       authToken.value = token
       conn
@@ -68,6 +77,7 @@ export const useGameStore = defineStore('gameStore', () => {
     }
 
     const onConnectError = (_ctx: ErrorContext, err: Error) => {
+      connected.value = false
       console.error('Error connecting to SpacetimeDB:', err)
     }
 
@@ -100,14 +110,14 @@ export const useGameStore = defineStore('gameStore', () => {
 
     dbConn.db.userCursor.onInsert((_ctx, newRow) => {
       const id = newRow.identity.toHexString()
-      if (id !== currentUserId && users.value[id] && users.value[id].online) {
+      if (id !== currentUserId.value && users.value[id] && users.value[id].online) {
         userCursors.value[id] = newRow
       }
     })
 
     dbConn.db.userCursor.onUpdate((_ctx, oldRow, newRow) => {
       const id = newRow.identity.toHexString()
-      if (id !== currentUserId && users.value[id] && users.value[id].online) {
+      if (id !== currentUserId.value && users.value[id] && users.value[id].online) {
         if (oldRow.room !== newRow.room) {
           delete userCursors.value[id]
         }
@@ -141,25 +151,40 @@ export const useGameStore = defineStore('gameStore', () => {
     })
 
     moveUser = (pos: DbVector2) => {
+      if (!connected.value) {
+        return
+      }
       dbConn!.reducers.movePosition(pos)
     }
 
     setCurrentRoomId = (id: number) => {
+      if (!connected.value) {
+        return
+      }
       currentRoomId = id
       dbConn!.reducers.moveToRoom(id)
       subToRoom(currentRoomId)
       userCursors.value = {}
     }
 
-    createVersusGameInstance = () => {
-      dbConn!.reducers.createGameInstance({ tag: 'TicTacToe' })
+    joinRandomGame = (gameParam: DbBoardGameParam) => {
+      if (!connected.value) {
+        return
+      }
+      dbConn!.reducers.joinRandomGame(gameParam)
     }
 
     makeRandomBoardGameMove = (instanceId: number) => {
+      if (!connected.value) {
+        return
+      }
       dbConn!.reducers.makeRandomBoardGameMove(instanceId)
     }
 
     makeBoardGameMove = (instanceId: number, boardGameMove: DbBoardGameMove) => {
+      if (!connected.value) {
+        return
+      }
       dbConn!.reducers.makeBoardGameMove(instanceId, boardGameMove)
     }
   }
@@ -170,9 +195,10 @@ export const useGameStore = defineStore('gameStore', () => {
     users,
     rooms,
     setCurrentRoomId,
-    createVersusGameInstance,
+    joinRandomGame,
     makeRandomBoardGameMove,
     makeBoardGameMove,
     gameInstances,
+    currentUserId,
   }
 })

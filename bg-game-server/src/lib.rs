@@ -2,10 +2,10 @@ pub mod board_games;
 pub mod math;
 
 use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
-use board_game::board::Board;
+use board_game::board::{Board, Player};
 use board_games::DbBoardGame;
 use math::DbVector2;
-use spacetimedb::{reducer, table, Identity, ReducerContext, Table, Timestamp};
+use spacetimedb::{reducer, table, Identity, ReducerContext, Table, Timestamp, TryInsertError};
 
 pub type RoomId = u32;
 pub const LOBBY_ROOM: RoomId = 0;
@@ -22,13 +22,25 @@ pub struct User {
 }
 
 #[table(name = versus_game_instance, public)]
+#[derive(Debug, Clone)]
 pub struct VersusGameInstance {
     #[primary_key]
     #[auto_inc]
     id: GameInstanceId,
     player_one: Option<Identity>,
     player_two: Option<Identity>,
+    game_done: bool,
+    game_state_param: DbBoardGameParam,
     game_state: DbBoardGame,
+}
+
+impl VersusGameInstance {
+    pub fn next_player(&self) -> Option<Player> {
+        match &self.game_state {
+            DbBoardGame::TicTacToe(board) => Some(board.next_player()),
+            DbBoardGame::Connect4(_) => None,
+        }
+    }
 }
 
 #[table(name = room, public)]
@@ -53,13 +65,11 @@ pub fn init(_ctx: &ReducerContext) {
 
 pub fn add_user_to_room(ctx: &ReducerContext, room_id: RoomId) {
     if let Some(room) = ctx.db.room().id().find(room_id) {
-        log::info!("add {:?}", room_id);
         ctx.db.room().id().update(Room {
             users: room.users + 1,
             ..room
         });
     } else {
-        log::info!("add {:?}", room_id);
         ctx.db.room().insert(Room {
             users: 1,
             id: room_id,
@@ -69,7 +79,6 @@ pub fn add_user_to_room(ctx: &ReducerContext, room_id: RoomId) {
 
 pub fn remove_user_from_room(ctx: &ReducerContext, room_id: RoomId) {
     if let Some(room) = ctx.db.room().id().find(room_id) {
-        log::info!("rm {:?}", room_id);
         ctx.db.room().id().update(Room {
             users: room.users - 1,
             ..room
@@ -87,12 +96,14 @@ pub fn user_connected(ctx: &ReducerContext) {
         position: DbVector2 { x: 0.0, y: 0.0 },
     });
     add_user_to_room(ctx, LOBBY_ROOM);
+    log::warn!("${} connected", ctx.sender);
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         ctx.db.user().identity().update(User {
             online: true,
             ..user
         });
     } else {
+        log::warn!("User not found!");
         ctx.db.user().insert(User {
             name: "Test".into(),
             identity: ctx.sender,
@@ -165,20 +176,30 @@ pub fn move_to_room(ctx: &ReducerContext, room: RoomId) -> Result<(), String> {
     Ok(())
 }
 
-#[reducer]
-pub fn create_game_instance(ctx: &ReducerContext, game_param: DbBoardGameParam) {
-    if let Err(err) = ctx
-        .db
-        .versus_game_instance()
-        .try_insert(VersusGameInstance {
-            id: 0,
-            game_state: DbBoardGame::from(game_param),
-            player_one: Some(ctx.sender),
-            player_two: None,
-        })
-    {
-        log::error!("{:?}", err);
+pub fn is_move_allowed(player_id: Identity, versus_game_instance: &VersusGameInstance) -> bool {
+    if versus_game_instance.player_one.is_none() || versus_game_instance.player_two.is_none() {
+        return false;
     }
+    if let Some(player) = match player_id {
+        id if versus_game_instance
+            .player_one
+            .is_some_and(|player_one_id| id == player_one_id) =>
+        {
+            Some(Player::A)
+        }
+        id if versus_game_instance
+            .player_two
+            .is_some_and(|player_two_id| id == player_two_id) =>
+        {
+            Some(Player::B)
+        }
+        _ => None,
+    } {
+        return versus_game_instance
+            .next_player()
+            .is_some_and(|p| p == player);
+    }
+    false
 }
 
 #[reducer]
@@ -187,55 +208,94 @@ pub fn make_board_game_move(
     game_instance_id: GameInstanceId,
     mv: DbBoardGameMove,
 ) {
-    if let Some(game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
+    if let Some(mut game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
+        if !is_move_allowed(ctx.sender, &game_instance) {
+            log::error!("Move was not allowed!");
+            return;
+        }
         match game_instance.game_state {
-            DbBoardGame::TicTacToe(mut board) => {
+            DbBoardGame::TicTacToe(ref mut board) => {
                 if let DbBoardGameMove::TicTacToe(ttt_move) = mv {
                     match board.play(ttt_move) {
-                        Ok(()) => {
-                            ctx.db
-                                .versus_game_instance()
-                                .id()
-                                .update(VersusGameInstance {
-                                    game_state: DbBoardGame::TicTacToe(board),
-                                    ..game_instance
-                                });
-                        }
+                        Ok(()) => {}
                         Err(err) => {
                             log::error!("Could not make move! {:?}", err);
                         }
                     }
+                    if board.is_done() {
+                        game_instance.game_done = true;
+                    }
                 }
             }
+            DbBoardGame::Connect4(_) => {}
+        }
+        ctx.db.versus_game_instance().id().update(game_instance);
+    }
+}
+
+pub fn make_random_move(ctx: &ReducerContext, board: &mut impl Board) {
+    match board.random_available_move(&mut ctx.rng()) {
+        Ok(mv) => match board.play(mv) {
+            Ok(()) => {}
+            Err(err) => {
+                log::error!("Could not make move! {:?}", err);
+            }
+        },
+        Err(_) => {
+            log::error!("Board done, could not make move!");
         }
     }
 }
 
 #[reducer]
 pub fn make_random_board_game_move(ctx: &ReducerContext, game_instance_id: GameInstanceId) {
-    if let Some(game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
+    if let Some(mut game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
         match game_instance.game_state {
-            DbBoardGame::TicTacToe(mut board) => {
-                match board.random_available_move(&mut ctx.rng()) {
-                    Ok(mv) => match board.play(mv) {
-                        Ok(()) => {
-                            ctx.db
-                                .versus_game_instance()
-                                .id()
-                                .update(VersusGameInstance {
-                                    game_state: DbBoardGame::TicTacToe(board),
-                                    ..game_instance
-                                });
-                        }
-                        Err(err) => {
-                            log::error!("Could not make move! {:?}", err);
-                        }
-                    },
-                    Err(_) => {
-                        log::error!("Board done, could not make move!");
-                    }
-                }
-            }
+            DbBoardGame::TicTacToe(ref mut board) => make_random_move(ctx, board),
+            DbBoardGame::Connect4(_) => {}
         }
+
+        ctx.db.versus_game_instance().id().update(game_instance);
+    }
+}
+
+pub fn create_game_instance(
+    ctx: &ReducerContext,
+    game_param: DbBoardGameParam,
+) -> Result<VersusGameInstance, TryInsertError<versus_game_instance__TableHandle>> {
+    ctx.db
+        .versus_game_instance()
+        .try_insert(VersusGameInstance {
+            id: 0,
+            game_state_param: game_param,
+            game_state: DbBoardGame::from(game_param),
+            player_one: Some(ctx.sender),
+            player_two: None,
+            game_done: false,
+        })
+}
+
+pub fn find_free_game_instance(
+    ctx: &ReducerContext,
+    game_param: DbBoardGameParam,
+) -> Option<VersusGameInstance> {
+    ctx.db.versus_game_instance().iter().find(|instance| {
+        !instance.game_done
+            && (instance.player_one.is_none() || instance.player_two.is_none())
+            && instance.game_state_param == game_param
+    })
+}
+
+#[reducer]
+pub fn join_random_game(ctx: &ReducerContext, game_param: DbBoardGameParam) {
+    if let Some(mut game_instance) = find_free_game_instance(ctx, game_param) {
+        if game_instance.player_one.is_none() {
+            game_instance.player_one = Some(ctx.sender);
+        } else {
+            game_instance.player_two = Some(ctx.sender);
+        }
+        ctx.db.versus_game_instance().id().update(game_instance);
+    } else if let Err(err) = create_game_instance(ctx, game_param) {
+        log::error!("Failed to create new game instance: {:?}", err);
     }
 }

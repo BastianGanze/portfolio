@@ -40,6 +40,7 @@ export namespace DbBoardGameMove {
   // One type is generated per variant and will be used in the `value` field of
   // the tagged union.
   export type TicTacToe = { tag: "TicTacToe", value: __Coord };
+  export type Connect4 = { tag: "Connect4", value: number };
 
   // Helper functions for constructing each variant of the tagged union.
   // ```
@@ -48,10 +49,12 @@ export namespace DbBoardGameMove {
   // assert!(foo.value === 42);
   // ```
   export const TicTacToe = (value: __Coord): DbBoardGameMove => ({ tag: "TicTacToe", value });
+  export const Connect4 = (value: number): DbBoardGameMove => ({ tag: "Connect4", value });
 
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createSumType([
       new SumTypeVariant("TicTacToe", __Coord.getTypeScriptAlgebraicType()),
+      new SumTypeVariant("Connect4", AlgebraicType.createU8Type()),
     ]);
   }
 
@@ -66,7 +69,7 @@ export namespace DbBoardGameMove {
 }
 
 // The tagged union or sum type for the algebraic type `DbBoardGameMove`.
-export type DbBoardGameMove = DbBoardGameMove.TicTacToe;
+export type DbBoardGameMove = DbBoardGameMove.TicTacToe | DbBoardGameMove.Connect4;
 
 export default DbBoardGameMove;
 
