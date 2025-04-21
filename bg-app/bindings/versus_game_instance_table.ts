@@ -34,6 +34,8 @@ import {
 } from "@clockworklabs/spacetimedb-sdk";
 import { VersusGameInstance } from "./versus_game_instance_type";
 import { DbBoardGameParam as __DbBoardGameParam } from "./db_board_game_param_type";
+import { Player as __Player } from "./player_type";
+import { Outcome as __Outcome } from "./outcome_type";
 import { DbBoardGame as __DbBoardGame } from "./db_board_game_type";
 
 import type { EventContext, Reducer, RemoteReducers, RemoteTables } from ".";

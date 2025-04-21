@@ -1,21 +1,47 @@
 <script setup lang="ts">
 import type { VersusGameInstance } from '~/bindings'
+import { Player } from '~/bindings'
 import { useGameStore } from '~/stores/gameStore'
 
 const props = defineProps<{ instance: VersusGameInstance, currentUserId: string }>()
-const { instance } = toRefs(props)
+const { instance, currentUserId } = toRefs(props)
 const { makeBoardGameMove } = useGameStore()
 
 function ticTacToeMove(index: number) {
-  if (instance.value.playerOne && instance.value.playerTwo) {
+  if (!instance.value.playerOne || !instance.value.playerTwo) {
     return
   }
   makeBoardGameMove(instance.value.id, { tag: 'TicTacToe', value: { index } })
 }
+
+const currentUserPlayer = computed(() => {
+  if (instance.value.playerOne?.toHexString() === currentUserId.value) {
+    return Player.A
+  }
+  if (instance.value.playerTwo?.toHexString() === currentUserId.value) {
+    return Player.B
+  }
+  return null
+})
+
+const bothPlayersAvailable = computed(() => {
+  return instance.value.playerOne && instance.value.playerTwo
+})
 </script>
 
 <template>
-  <div v-if="instance">
+  <div v-if="instance && currentUserPlayer">
+    <div v-if="!instance.outcome && bothPlayersAvailable">
+      {{ instance.nextPlayer.tag === currentUserPlayer.tag ? 'Your turn!' : 'Opponents turn...' }}
+    </div>
+    <div v-if="instance.outcome">
+      <div v-if="instance.outcome.tag === 'Draw'">
+        Draw!
+      </div>
+      <div v-else-if="instance.outcome.tag === 'WonBy'">
+        {{ instance.outcome.value.tag === currentUserPlayer.tag ? 'You win!' : 'You lose!' }}
+      </div>
+    </div>
     <div v-if="instance.gameState.tag === 'TicTacToe'" class="tic-tac-toe-board">
       <div
         v-for="(player, i) in instance.gameState.value.tiles" :key="i" class="tic-tac-toe-cell"

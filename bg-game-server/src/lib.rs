@@ -2,7 +2,7 @@ pub mod board_games;
 pub mod math;
 
 use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
-use board_game::board::{Board, Player};
+use board_game::board::{Board, Outcome, Player};
 use board_games::DbBoardGame;
 use math::DbVector2;
 use spacetimedb::{reducer, table, Identity, ReducerContext, Table, Timestamp, TryInsertError};
@@ -21,15 +21,17 @@ pub struct User {
     game_instance_id: Option<GameInstanceId>,
 }
 
-#[table(name = versus_game_instance, public)]
 #[derive(Debug, Clone)]
+#[table(name = versus_game_instance, public)]
 pub struct VersusGameInstance {
     #[primary_key]
     #[auto_inc]
     id: GameInstanceId,
     player_one: Option<Identity>,
     player_two: Option<Identity>,
+    next_player: Player,
     game_done: bool,
+    outcome: Option<Outcome>,
     game_state_param: DbBoardGameParam,
     game_state: DbBoardGame,
 }
@@ -222,9 +224,9 @@ pub fn make_board_game_move(
                             log::error!("Could not make move! {:?}", err);
                         }
                     }
-                    if board.is_done() {
-                        game_instance.game_done = true;
-                    }
+                    game_instance.game_done = board.is_done();
+                    game_instance.outcome = board.outcome();
+                    game_instance.next_player = board.next_player();
                 }
             }
             DbBoardGame::Connect4(_) => {}
@@ -271,6 +273,8 @@ pub fn create_game_instance(
             game_state: DbBoardGame::from(game_param),
             player_one: Some(ctx.sender),
             player_two: None,
+            outcome: None,
+            next_player: Player::A,
             game_done: false,
         })
 }
