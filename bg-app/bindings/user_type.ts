@@ -32,12 +32,16 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
+import { UserGameScores as __UserGameScores } from "./user_game_scores_type";
+
 export type User = {
   identity: Identity,
   name: string,
   firstSeen: Timestamp,
   online: boolean,
+  connected: boolean,
   gameInstanceId: number | undefined,
+  gameScores: __UserGameScores[],
 };
 
 /**
@@ -54,7 +58,9 @@ export namespace User {
       new ProductTypeElement("name", AlgebraicType.createStringType()),
       new ProductTypeElement("firstSeen", AlgebraicType.createTimestampType()),
       new ProductTypeElement("online", AlgebraicType.createBoolType()),
+      new ProductTypeElement("connected", AlgebraicType.createBoolType()),
       new ProductTypeElement("gameInstanceId", AlgebraicType.createOptionType(AlgebraicType.createU32Type())),
+      new ProductTypeElement("gameScores", AlgebraicType.createArrayType(__UserGameScores.getTypeScriptAlgebraicType())),
     ]);
   }
 

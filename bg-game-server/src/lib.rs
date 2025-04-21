@@ -5,11 +5,22 @@ use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
 use board_game::board::{Board, Outcome, Player};
 use board_games::DbBoardGame;
 use math::DbVector2;
-use spacetimedb::{reducer, table, Identity, ReducerContext, Table, Timestamp, TryInsertError};
+use spacetimedb::{
+    reducer, table, Identity, ReducerContext, ScheduleAt, SpacetimeType, Table, TimeDuration,
+    Timestamp, TryInsertError,
+};
 
 pub type RoomId = u32;
 pub const LOBBY_ROOM: RoomId = 0;
 pub type GameInstanceId = u32;
+
+#[derive(SpacetimeType, Debug, Clone, PartialEq)]
+pub struct UserGameScores {
+    game: DbBoardGameParam,
+    won: u32,
+    lost: u32,
+    draws: u32,
+}
 
 #[table(name = user, public)]
 pub struct User {
@@ -18,7 +29,9 @@ pub struct User {
     name: String,
     first_seen: Timestamp,
     online: bool,
+    connected: bool,
     game_instance_id: Option<GameInstanceId>,
+    game_scores: Vec<UserGameScores>,
 }
 
 #[derive(Debug, Clone)]
@@ -60,6 +73,46 @@ pub struct UserCursor {
     position: DbVector2,
 }
 
+#[table(name = timeout_user_schedule, scheduled(timeout_user))]
+struct TimeoutUserSchedule {
+    #[primary_key]
+    #[auto_inc]
+    scheduled_id: u64,
+    scheduled_at: ScheduleAt,
+    player_identity: Identity,
+}
+
+#[reducer]
+fn timeout_user(ctx: &ReducerContext, timeout: TimeoutUserSchedule) {
+    if ctx.sender != ctx.identity() {
+        log::error!("Scheduled reducer should only be called by the module itself");
+        return;
+    }
+
+    if let Some(user) = ctx.db.user().identity().find(timeout.player_identity) {
+        if !user.connected && user.online {
+            ctx.db.user().identity().update(User {
+                online: false,
+                ..user
+            });
+        }
+        if let Some(user_cursor) = ctx
+            .db
+            .user_cursor()
+            .identity()
+            .find(timeout.player_identity)
+        {
+            remove_user_from_room(ctx, user_cursor.room);
+            ctx.db.user_cursor().delete(user_cursor);
+        }
+    } else {
+        log::warn!(
+            "Timeout event for unknown user with identity {:?}",
+            timeout.player_identity
+        );
+    }
+}
+
 #[reducer(init)]
 pub fn init(_ctx: &ReducerContext) {
     // Called when the module is initially published
@@ -98,10 +151,9 @@ pub fn user_connected(ctx: &ReducerContext) {
         position: DbVector2 { x: 0.0, y: 0.0 },
     });
     add_user_to_room(ctx, LOBBY_ROOM);
-    log::warn!("${} connected", ctx.sender);
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
         ctx.db.user().identity().update(User {
-            online: true,
+            connected: true,
             ..user
         });
     } else {
@@ -110,22 +162,35 @@ pub fn user_connected(ctx: &ReducerContext) {
             name: "Test".into(),
             identity: ctx.sender,
             first_seen: ctx.timestamp,
+            connected: true,
             online: true,
             game_instance_id: None,
+            game_scores: vec![],
         });
+    }
+    for timeout_schedule in ctx
+        .db
+        .timeout_user_schedule()
+        .iter()
+        .filter(|schedule| schedule.player_identity == ctx.sender)
+    {
+        ctx.db.timeout_user_schedule().delete(timeout_schedule);
     }
 }
 
 #[reducer(client_disconnected)]
 pub fn identity_disconnected(ctx: &ReducerContext) {
     if let Some(user) = ctx.db.user().identity().find(ctx.sender) {
-        if let Some(user_cursor) = ctx.db.user_cursor().identity().find(ctx.sender) {
-            remove_user_from_room(ctx, user_cursor.room);
-            ctx.db.user_cursor().delete(user_cursor);
-        }
         ctx.db.user().identity().update(User {
-            online: false,
+            connected: false,
             ..user
+        });
+        let thirty_seconds = TimeDuration::from_micros(30_000_000);
+        let future_timestamp: Timestamp = ctx.timestamp + thirty_seconds;
+        ctx.db.timeout_user_schedule().insert(TimeoutUserSchedule {
+            scheduled_id: 0,
+            player_identity: ctx.sender,
+            scheduled_at: future_timestamp.into(),
         });
     } else {
         log::warn!(
@@ -204,6 +269,47 @@ pub fn is_move_allowed(player_id: Identity, versus_game_instance: &VersusGameIns
     false
 }
 
+#[derive(SpacetimeType, Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum GameOutcome {
+    Won,
+    Lost,
+    Draw,
+}
+pub fn increase_player_score_by_outcome(
+    ctx: &ReducerContext,
+    player_identity: Identity,
+    game_state_param: DbBoardGameParam,
+    outcome: GameOutcome,
+) {
+    if let Some(user) = ctx.db.user().identity().find(player_identity) {
+        let mut game_scores = user.game_scores.clone();
+        let game_score_index = match game_scores
+            .iter()
+            .position(|score| score.game == game_state_param)
+        {
+            Some(index) => index,
+            None => {
+                game_scores.push(UserGameScores {
+                    game: game_state_param,
+                    won: 0,
+                    lost: 0,
+                    draws: 0,
+                });
+                game_scores.len() - 1
+            }
+        };
+        match outcome {
+            GameOutcome::Won => game_scores[game_score_index].won += 1,
+            GameOutcome::Draw => game_scores[game_score_index].draws += 1,
+            GameOutcome::Lost => game_scores[game_score_index].lost += 1,
+        }
+        ctx.db.user().identity().update(User {
+            game_scores,
+            ..user
+        });
+    }
+}
+
 #[reducer]
 pub fn make_board_game_move(
     ctx: &ReducerContext,
@@ -215,6 +321,7 @@ pub fn make_board_game_move(
             log::error!("Move was not allowed!");
             return;
         }
+        let outcome_before_move = game_instance.outcome;
         match game_instance.game_state {
             DbBoardGame::TicTacToe(ref mut board) => {
                 if let DbBoardGameMove::TicTacToe(ttt_move) = mv {
@@ -231,7 +338,58 @@ pub fn make_board_game_move(
             }
             DbBoardGame::Connect4(_) => {}
         }
+        if let (None, Some(outcome)) = (outcome_before_move, game_instance.outcome) {
+            calculate_scores(ctx, &game_instance, outcome);
+        }
         ctx.db.versus_game_instance().id().update(game_instance);
+    }
+}
+
+fn calculate_scores(ctx: &ReducerContext, game_instance: &VersusGameInstance, outcome: Outcome) {
+    match outcome {
+        Outcome::WonBy(player_won) => {
+            if let Some(player_won_identity) = match player_won {
+                Player::A => game_instance.player_one,
+                Player::B => game_instance.player_two,
+            } {
+                increase_player_score_by_outcome(
+                    ctx,
+                    player_won_identity,
+                    game_instance.game_state_param,
+                    GameOutcome::Won,
+                );
+                if let Some(player_lost_identity) = game_instance
+                    .player_one
+                    .filter(|&id| id != player_won_identity)
+                    .or(game_instance.player_two)
+                {
+                    increase_player_score_by_outcome(
+                        ctx,
+                        player_lost_identity,
+                        game_instance.game_state_param,
+                        GameOutcome::Lost,
+                    );
+                }
+            }
+        }
+        Outcome::Draw => {
+            if let (Some(player_one), Some(player_two)) =
+                (game_instance.player_one, game_instance.player_two)
+            {
+                increase_player_score_by_outcome(
+                    ctx,
+                    player_one,
+                    game_instance.game_state_param,
+                    GameOutcome::Draw,
+                );
+                increase_player_score_by_outcome(
+                    ctx,
+                    player_two,
+                    game_instance.game_state_param,
+                    GameOutcome::Draw,
+                );
+            }
+        }
     }
 }
 

@@ -48,12 +48,16 @@ import { MoveToRoom } from "./move_to_room_reducer.ts";
 export { MoveToRoom };
 import { SayHello } from "./say_hello_reducer.ts";
 export { SayHello };
+import { TimeoutUser } from "./timeout_user_reducer.ts";
+export { TimeoutUser };
 import { UserConnected } from "./user_connected_reducer.ts";
 export { UserConnected };
 
 // Import and reexport all table handle types
 import { RoomTableHandle } from "./room_table.ts";
 export { RoomTableHandle };
+import { TimeoutUserScheduleTableHandle } from "./timeout_user_schedule_table.ts";
+export { TimeoutUserScheduleTableHandle };
 import { UserTableHandle } from "./user_table.ts";
 export { UserTableHandle };
 import { UserCursorTableHandle } from "./user_cursor_table.ts";
@@ -80,10 +84,14 @@ import { Room } from "./room_type.ts";
 export { Room };
 import { TttBoard } from "./ttt_board_type.ts";
 export { TttBoard };
+import { TimeoutUserSchedule } from "./timeout_user_schedule_type.ts";
+export { TimeoutUserSchedule };
 import { User } from "./user_type.ts";
 export { User };
 import { UserCursor } from "./user_cursor_type.ts";
 export { UserCursor };
+import { UserGameScores } from "./user_game_scores_type.ts";
+export { UserGameScores };
 import { VersusGameInstance } from "./versus_game_instance_type.ts";
 export { VersusGameInstance };
 
@@ -93,6 +101,11 @@ const REMOTE_MODULE = {
       tableName: "room",
       rowType: Room.getTypeScriptAlgebraicType(),
       primaryKey: "id",
+    },
+    timeout_user_schedule: {
+      tableName: "timeout_user_schedule",
+      rowType: TimeoutUserSchedule.getTypeScriptAlgebraicType(),
+      primaryKey: "scheduledId",
     },
     user: {
       tableName: "user",
@@ -139,6 +152,10 @@ const REMOTE_MODULE = {
       reducerName: "say_hello",
       argsType: SayHello.getTypeScriptAlgebraicType(),
     },
+    timeout_user: {
+      reducerName: "timeout_user",
+      argsType: TimeoutUser.getTypeScriptAlgebraicType(),
+    },
     user_connected: {
       reducerName: "user_connected",
       argsType: UserConnected.getTypeScriptAlgebraicType(),
@@ -177,6 +194,7 @@ export type Reducer = never
 | { name: "MovePosition", args: MovePosition }
 | { name: "MoveToRoom", args: MoveToRoom }
 | { name: "SayHello", args: SayHello }
+| { name: "TimeoutUser", args: TimeoutUser }
 | { name: "UserConnected", args: UserConnected }
 ;
 
@@ -283,6 +301,22 @@ export class RemoteReducers {
     this.connection.offReducer("say_hello", callback);
   }
 
+  timeoutUser(timeout: TimeoutUserSchedule) {
+    const __args = { timeout };
+    let __writer = new BinaryWriter(1024);
+    TimeoutUser.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("timeout_user", __argsBuffer, this.setCallReducerFlags.timeoutUserFlags);
+  }
+
+  onTimeoutUser(callback: (ctx: ReducerEventContext, timeout: TimeoutUserSchedule) => void) {
+    this.connection.onReducer("timeout_user", callback);
+  }
+
+  removeOnTimeoutUser(callback: (ctx: ReducerEventContext, timeout: TimeoutUserSchedule) => void) {
+    this.connection.offReducer("timeout_user", callback);
+  }
+
   onUserConnected(callback: (ctx: ReducerEventContext) => void) {
     this.connection.onReducer("user_connected", callback);
   }
@@ -324,6 +358,11 @@ export class SetReducerFlags {
     this.sayHelloFlags = flags;
   }
 
+  timeoutUserFlags: CallReducerFlags = 'FullUpdate';
+  timeoutUser(flags: CallReducerFlags) {
+    this.timeoutUserFlags = flags;
+  }
+
 }
 
 export class RemoteTables {
@@ -331,6 +370,10 @@ export class RemoteTables {
 
   get room(): RoomTableHandle {
     return new RoomTableHandle(this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room));
+  }
+
+  get timeoutUserSchedule(): TimeoutUserScheduleTableHandle {
+    return new TimeoutUserScheduleTableHandle(this.connection.clientCache.getOrCreateTable<TimeoutUserSchedule>(REMOTE_MODULE.tables.timeout_user_schedule));
   }
 
   get user(): UserTableHandle {
