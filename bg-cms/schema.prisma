@@ -61,8 +61,10 @@ model Project {
   mainImage_extension    String?
   shortDescription       Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   content                Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  unlockContent          Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   shortDescriptionGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   contentGerman          Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  unlockContentGerman    Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   roomId                 Int?
   game                   String    @default("")
   tags                   Tag[]     @relation("Project_tags")

@@ -205,6 +205,18 @@ export const lists = {
         links: true,
         dividers: true,
       }),
+      unlockContent: document({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1],
+        ],
+        links: true,
+        dividers: true,
+      }),
       shortDescriptionGerman: document({
         formatting: true,
         layouts: [
@@ -218,6 +230,18 @@ export const lists = {
         dividers: true,
       }),
       contentGerman: document({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1],
+        ],
+        links: true,
+        dividers: true,
+      }),
+      unlockContentGerman: document({
         formatting: true,
         layouts: [
           [1, 1],

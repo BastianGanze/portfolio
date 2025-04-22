@@ -360,8 +360,10 @@ type Project {
   mainImage: ImageFieldOutput
   shortDescription: Project_shortDescription_Document
   content: Project_content_Document
+  unlockContent: Project_unlockContent_Document
   shortDescriptionGerman: Project_shortDescriptionGerman_Document
   contentGerman: Project_contentGerman_Document
+  unlockContentGerman: Project_unlockContentGerman_Document
   roomId: Int
   game: String
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
@@ -392,11 +394,19 @@ type Project_content_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
 
+type Project_unlockContent_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
 type Project_shortDescriptionGerman_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
 
 type Project_contentGerman_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Project_unlockContentGerman_Document {
   document(hydrateRelationships: Boolean! = false): JSON!
 }
 
@@ -453,8 +463,10 @@ input ProjectUpdateInput {
   mainImage: ImageFieldInput
   shortDescription: JSON
   content: JSON
+  unlockContent: JSON
   shortDescriptionGerman: JSON
   contentGerman: JSON
+  unlockContentGerman: JSON
   roomId: Int
   game: String
   tags: TagRelateToManyForUpdateInput
@@ -482,8 +494,10 @@ input ProjectCreateInput {
   mainImage: ImageFieldInput
   shortDescription: JSON
   content: JSON
+  unlockContent: JSON
   shortDescriptionGerman: JSON
   contentGerman: JSON
+  unlockContentGerman: JSON
   roomId: Int
   game: String
   tags: TagRelateToManyForCreateInput
