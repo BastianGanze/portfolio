@@ -2,6 +2,8 @@ pub mod board_games;
 pub mod math;
 
 use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
+use board_game::ai::mcts::MCTSBot;
+use board_game::ai::Bot;
 use board_game::board::{Board, Outcome, Player};
 use board_games::DbBoardGame;
 use math::DbVector2;
@@ -13,6 +15,7 @@ use spacetimedb::{
 pub type RoomId = u32;
 pub const LOBBY_ROOM: RoomId = 0;
 pub type GameInstanceId = u32;
+pub type UserId = u32;
 
 #[derive(SpacetimeType, Debug, Clone, PartialEq)]
 pub struct UserGameScores {
@@ -44,6 +47,7 @@ pub struct VersusGameInstance {
     player_two: Option<Identity>,
     next_player: Player,
     game_done: bool,
+    match_started: bool,
     outcome: Option<Outcome>,
     game_state_param: DbBoardGameParam,
     game_state: DbBoardGame,
@@ -113,6 +117,46 @@ fn timeout_user(ctx: &ReducerContext, timeout: TimeoutUserSchedule) {
     }
 }
 
+#[table(name = bot_move_scheduler, scheduled(bot_move))]
+struct BotMoveScheduler {
+    #[primary_key]
+    #[auto_inc]
+    scheduled_id: u64,
+    scheduled_at: ScheduleAt,
+    game_instance_id: GameInstanceId,
+}
+
+#[reducer]
+fn bot_move(ctx: &ReducerContext, timeout: BotMoveScheduler) {
+    if ctx.sender != ctx.identity() {
+        log::error!("Scheduled reducer should only be called by the module itself");
+        return;
+    }
+
+    if let Some(mut game_instance) = ctx
+        .db
+        .versus_game_instance()
+        .id()
+        .find(timeout.game_instance_id)
+    {
+        let mut bot = MCTSBot::new(100, 2.0, ctx.rng());
+        if let Ok(mv) = match game_instance.game_state {
+            DbBoardGame::TicTacToe(ref mut board) => bot
+                .select_move(board)
+                .map(DbBoardGameMove::TicTacToe)
+                .map_err(|m| format!("Bot error: {:?}", m)),
+            DbBoardGame::Connect4(_) => Err("Connect4 bot not implemented".to_string()),
+        } {
+            _make_board_game_move(ctx, timeout.game_instance_id, mv, true);
+        }
+    } else {
+        log::warn!(
+            "Timeout event for unknown game instance with id {:?}",
+            timeout.game_instance_id
+        );
+    }
+}
+
 #[reducer(init)]
 pub fn init(_ctx: &ReducerContext) {
     // Called when the module is initially published
@@ -164,7 +208,6 @@ pub fn user_connected(ctx: &ReducerContext) {
             ..user
         });
     } else {
-        log::warn!("User not found!");
         ctx.db.user().insert(User {
             name: "Test".into(),
             identity: ctx.sender,
@@ -250,9 +293,16 @@ pub fn move_to_room(ctx: &ReducerContext, room: RoomId) -> Result<(), String> {
     Ok(())
 }
 
-pub fn is_move_allowed(player_id: Identity, versus_game_instance: &VersusGameInstance) -> bool {
-    if versus_game_instance.player_one.is_none() || versus_game_instance.player_two.is_none() {
+pub fn is_move_allowed(
+    player_id: Identity,
+    versus_game_instance: &VersusGameInstance,
+    bot_move: bool,
+) -> bool {
+    if !versus_game_instance.match_started && versus_game_instance.game_done {
         return false;
+    }
+    if bot_move {
+        return true;
     }
     if let Some(player) = match player_id {
         id if versus_game_instance
@@ -317,14 +367,14 @@ pub fn increase_player_score_by_outcome(
     }
 }
 
-#[reducer]
-pub fn make_board_game_move(
+fn _make_board_game_move(
     ctx: &ReducerContext,
     game_instance_id: GameInstanceId,
     mv: DbBoardGameMove,
+    is_bot: bool,
 ) {
     if let Some(mut game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
-        if !is_move_allowed(ctx.sender, &game_instance) {
+        if !is_move_allowed(ctx.sender, &game_instance, is_bot) {
             log::error!("Move was not allowed!");
             return;
         }
@@ -348,8 +398,20 @@ pub fn make_board_game_move(
         if let (None, Some(outcome)) = (outcome_before_move, game_instance.outcome) {
             calculate_scores(ctx, &game_instance, outcome);
         }
+        if is_next_player_a_bot(&game_instance) {
+            schedule_bot_move(ctx, game_instance.id);
+        }
         ctx.db.versus_game_instance().id().update(game_instance);
     }
+}
+
+#[reducer]
+pub fn make_board_game_move(
+    ctx: &ReducerContext,
+    game_instance_id: GameInstanceId,
+    mv: DbBoardGameMove,
+) {
+    _make_board_game_move(ctx, game_instance_id, mv, false);
 }
 
 fn calculate_scores(ctx: &ReducerContext, game_instance: &VersusGameInstance, outcome: Outcome) {
@@ -365,30 +427,29 @@ fn calculate_scores(ctx: &ReducerContext, game_instance: &VersusGameInstance, ou
                     game_instance.game_state_param,
                     GameOutcome::Won,
                 );
-                if let Some(player_lost_identity) = game_instance
-                    .player_one
-                    .filter(|&id| id != player_won_identity)
-                    .or(game_instance.player_two)
-                {
-                    increase_player_score_by_outcome(
-                        ctx,
-                        player_lost_identity,
-                        game_instance.game_state_param,
-                        GameOutcome::Lost,
-                    );
-                }
+            }
+            if let Some(player_lost_identity) = match player_won {
+                Player::A => game_instance.player_two,
+                Player::B => game_instance.player_one,
+            } {
+                increase_player_score_by_outcome(
+                    ctx,
+                    player_lost_identity,
+                    game_instance.game_state_param,
+                    GameOutcome::Lost,
+                );
             }
         }
         Outcome::Draw => {
-            if let (Some(player_one), Some(player_two)) =
-                (game_instance.player_one, game_instance.player_two)
-            {
+            if let Some(player_one) = game_instance.player_one {
                 increase_player_score_by_outcome(
                     ctx,
                     player_one,
                     game_instance.game_state_param,
                     GameOutcome::Draw,
                 );
+            }
+            if let Some(player_two) = game_instance.player_two {
                 increase_player_score_by_outcome(
                     ctx,
                     player_two,
@@ -438,6 +499,7 @@ pub fn create_game_instance(
             game_state: DbBoardGame::from(game_param),
             player_one: Some(ctx.sender),
             player_two: None,
+            match_started: false,
             outcome: None,
             next_player: Player::A,
             game_done: false,
@@ -450,6 +512,7 @@ pub fn find_free_game_instance(
 ) -> Option<VersusGameInstance> {
     ctx.db.versus_game_instance().iter().find(|instance| {
         !instance.game_done
+            && !instance.match_started
             && (instance.player_one.is_none() || instance.player_two.is_none())
             && instance.game_state_param == game_param
     })
@@ -478,6 +541,37 @@ pub fn abandon_game(ctx: &ReducerContext) {
     }
 }
 
+pub fn schedule_bot_move(ctx: &ReducerContext, game_instance_id: GameInstanceId) {
+    let one_second = TimeDuration::from_micros(1_000_000);
+    let future_timestamp: Timestamp = ctx.timestamp + one_second;
+    ctx.db.bot_move_scheduler().insert(BotMoveScheduler {
+        scheduled_id: 0,
+        game_instance_id,
+        scheduled_at: future_timestamp.into(),
+    });
+}
+
+pub fn is_next_player_a_bot(game_instance: &VersusGameInstance) -> bool {
+    match game_instance.next_player() {
+        Some(Player::A) => game_instance.player_one.is_none(),
+        Some(Player::B) => game_instance.player_two.is_none(),
+        None => false,
+    }
+}
+
+#[reducer]
+pub fn force_start_game(ctx: &ReducerContext, instance_id: GameInstanceId) {
+    if let Some(mut game_instance) = ctx.db.versus_game_instance().id().find(instance_id) {
+        game_instance.match_started = true;
+        if is_next_player_a_bot(&game_instance) {
+            schedule_bot_move(ctx, game_instance.id);
+        }
+        ctx.db.versus_game_instance().id().update(game_instance);
+    } else {
+        log::error!("Game instance not found!");
+    }
+}
+
 #[reducer]
 pub fn join_random_game(ctx: &ReducerContext, game_param: DbBoardGameParam) {
     if let Some(mut game_instance) = find_free_game_instance(ctx, game_param) {
@@ -485,6 +579,9 @@ pub fn join_random_game(ctx: &ReducerContext, game_param: DbBoardGameParam) {
             game_instance.player_one = Some(ctx.sender);
         } else {
             game_instance.player_two = Some(ctx.sender);
+        }
+        if (game_instance.player_one.is_some() && game_instance.player_two.is_some()) {
+            game_instance.match_started = true;
         }
         ctx.db.versus_game_instance().id().update(game_instance);
     } else if let Err(err) = create_game_instance(ctx, game_param) {

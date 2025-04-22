@@ -8,7 +8,7 @@ const { instance, currentUserId } = toRefs(props)
 const { makeBoardGameMove } = useGameStore()
 
 function ticTacToeMove(index: number) {
-  if (!instance.value.playerOne || !instance.value.playerTwo) {
+  if (!instance.value.matchStarted) {
     return
   }
   makeBoardGameMove(instance.value.id, { tag: 'TicTacToe', value: { index } })
@@ -23,10 +23,6 @@ const currentUserPlayer = computed(() => {
   }
   return null
 })
-
-const bothPlayersAvailable = computed(() => {
-  return instance.value.playerOne && instance.value.playerTwo
-})
 </script>
 
 <template>
@@ -34,7 +30,7 @@ const bothPlayersAvailable = computed(() => {
     <div v-if="!instance.outcome && instance.gameDone">
       Game abandoned.
     </div>
-    <div v-if="!instance.outcome && !instance.gameDone && bothPlayersAvailable">
+    <div v-if="!instance.outcome && !instance.gameDone && instance.matchStarted">
       {{ instance.nextPlayer.tag === currentUserPlayer.tag ? 'Your turn!' : 'Opponents turn...' }}
     </div>
     <div v-if="instance.outcome">

@@ -27,7 +27,6 @@ export const lists = {
       isAdmin: checkbox(),
     },
   }),
-
   Post: list({
     access: {
       operation: {
@@ -104,7 +103,51 @@ export const lists = {
       projects: relationship({ ref: 'Project.tags', many: true }),
     },
   }),
-
+  Page: list({
+    access: {
+      operation: {
+        query: allowAll,
+        create: isAdmin,
+        update: isAdmin,
+        delete: isAdmin,
+      },
+    },
+    fields: {
+      title: text({ validation: { isRequired: true } }),
+      titleGerman: text({ validation: { isRequired: true } }),
+      createdAt: timestamp({
+        defaultValue: { kind: 'now' },
+        ui: {
+          createView: { fieldMode: 'hidden' },
+          itemView: { fieldMode: 'read' },
+        },
+      }),
+      content: document({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1],
+        ],
+        links: true,
+        dividers: true,
+      }),
+      contentGerman: document({
+        formatting: true,
+        layouts: [
+          [1, 1],
+          [1, 1, 1],
+          [2, 1],
+          [1, 2],
+          [1, 2, 1],
+        ],
+        links: true,
+        dividers: true,
+      }),
+    },
+  }),
   Project: list({
     access: {
       operation: {
@@ -187,6 +230,7 @@ export const lists = {
         dividers: true,
       }),
       roomId: integer(),
+      game: text({}),
       tags: relationship({
         ref: 'Tag.projects',
         many: true,

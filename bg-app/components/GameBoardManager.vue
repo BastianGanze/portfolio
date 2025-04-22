@@ -33,18 +33,23 @@ watch([gameInstances, seekRunningGame], () => {
 
 const canAddBot = computed(() => {
   if (activeInstance.value) {
-    return (activeInstance.value.playerOne?.toHexString() === currentUserId.value && !activeInstance.value.playerTwo)
-      || (activeInstance.value.playerTwo?.toHexString() === currentUserId.value && !activeInstance.value.playerOne)
+    return !activeInstance.value.gameDone && !activeInstance.value.matchStarted
   }
   return false
 })
 
-const { joinRandomGame, abandonGame } = useGameStore()
+const { joinRandomGame, abandonGame, forceStartGame } = useGameStore()
 
 function joinGame() {
   activeInstanceId.value = null
   seekRunningGame.value = true
   joinRandomGame(boardGameParam.value)
+}
+
+function froceGameStart() {
+  if (activeInstance.value) {
+    forceStartGame(activeInstance.value.id)
+  }
 }
 
 const opposingUserIdentity = computed(() => {
@@ -89,14 +94,14 @@ const opposingUser = computed(() => {
     <button v-else class="btn" @click="joinGame">
       Join game
     </button>
-    <button
-      v-if="canAddBot" class="btn"
-    >
-      Play against Bot
-    </button>
     <div v-if="canAddBot">
       Waiting for player...
     </div>
+    <button
+      v-if="canAddBot" class="btn" @click="froceGameStart"
+    >
+      Play against Bot
+    </button>
     <div v-if="activeInstance">
       <GameBoard :instance="activeInstance" :current-user-id="currentUserId" />
     </div>

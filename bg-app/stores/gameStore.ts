@@ -42,6 +42,8 @@ export const useGameStore = defineStore('gameStore', () => {
   }
   let makeBoardGameMove = (_instanceId: number, _boardGameMove: DbBoardGameMove) => {
   }
+  let forceStartGame = (_instanceId: number) => {
+  }
 
   let abandonGame = () => {
   }
@@ -201,6 +203,13 @@ export const useGameStore = defineStore('gameStore', () => {
         }
         dbConn!.reducers.abandonGame()
       }
+
+      forceStartGame = (instanceId: number) => {
+        if (!connected.value) {
+          return
+        }
+        dbConn!.reducers.forceStartGame(instanceId)
+      }
     }
     connectDb()
   }
@@ -215,6 +224,7 @@ export const useGameStore = defineStore('gameStore', () => {
     makeRandomBoardGameMove,
     makeBoardGameMove,
     abandonGame,
+    forceStartGame,
     gameInstances,
     currentUserId,
   }

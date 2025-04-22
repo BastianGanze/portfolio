@@ -53,8 +53,7 @@ const projects = computed(() => {
           My name is <strong>Bastian Ganze</strong>. My current endeavours focus on my love for <a
             aria-label="Link to the rust programming langauge" href="https://www.rust-lang.org/"
           >Rust</a> and game
-          design as well as building a web/android app with Vue.js and Capacitor. Please take a look if you want to find
-          out more. :)
+          design as well as building a web/android app with Vue.js and Capacitor.
         </p>
       </article>
       <div class="relative flex py-5 items-center">

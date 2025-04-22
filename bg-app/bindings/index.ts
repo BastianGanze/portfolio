@@ -36,6 +36,10 @@ import {
 // Import and reexport all reducer arg types
 import { AbandonGame } from "./abandon_game_reducer.ts";
 export { AbandonGame };
+import { BotMove } from "./bot_move_reducer.ts";
+export { BotMove };
+import { ForceStartGame } from "./force_start_game_reducer.ts";
+export { ForceStartGame };
 import { IdentityDisconnected } from "./identity_disconnected_reducer.ts";
 export { IdentityDisconnected };
 import { JoinRandomGame } from "./join_random_game_reducer.ts";
@@ -56,6 +60,8 @@ import { UserConnected } from "./user_connected_reducer.ts";
 export { UserConnected };
 
 // Import and reexport all table handle types
+import { BotMoveSchedulerTableHandle } from "./bot_move_scheduler_table.ts";
+export { BotMoveSchedulerTableHandle };
 import { RoomTableHandle } from "./room_table.ts";
 export { RoomTableHandle };
 import { TimeoutUserScheduleTableHandle } from "./timeout_user_schedule_table.ts";
@@ -68,6 +74,8 @@ import { VersusGameInstanceTableHandle } from "./versus_game_instance_table.ts";
 export { VersusGameInstanceTableHandle };
 
 // Import and reexport all types
+import { BotMoveScheduler } from "./bot_move_scheduler_type.ts";
+export { BotMoveScheduler };
 import { Coord } from "./coord_type.ts";
 export { Coord };
 import { DbBoardGame } from "./db_board_game_type.ts";
@@ -99,6 +107,11 @@ export { VersusGameInstance };
 
 const REMOTE_MODULE = {
   tables: {
+    bot_move_scheduler: {
+      tableName: "bot_move_scheduler",
+      rowType: BotMoveScheduler.getTypeScriptAlgebraicType(),
+      primaryKey: "scheduledId",
+    },
     room: {
       tableName: "room",
       rowType: Room.getTypeScriptAlgebraicType(),
@@ -129,6 +142,14 @@ const REMOTE_MODULE = {
     abandon_game: {
       reducerName: "abandon_game",
       argsType: AbandonGame.getTypeScriptAlgebraicType(),
+    },
+    bot_move: {
+      reducerName: "bot_move",
+      argsType: BotMove.getTypeScriptAlgebraicType(),
+    },
+    force_start_game: {
+      reducerName: "force_start_game",
+      argsType: ForceStartGame.getTypeScriptAlgebraicType(),
     },
     identity_disconnected: {
       reducerName: "identity_disconnected",
@@ -194,6 +215,8 @@ const REMOTE_MODULE = {
 // A type representing all the possible variants of a reducer.
 export type Reducer = never
 | { name: "AbandonGame", args: AbandonGame }
+| { name: "BotMove", args: BotMove }
+| { name: "ForceStartGame", args: ForceStartGame }
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "JoinRandomGame", args: JoinRandomGame }
 | { name: "MakeBoardGameMove", args: MakeBoardGameMove }
@@ -218,6 +241,38 @@ export class RemoteReducers {
 
   removeOnAbandonGame(callback: (ctx: ReducerEventContext) => void) {
     this.connection.offReducer("abandon_game", callback);
+  }
+
+  botMove(timeout: BotMoveScheduler) {
+    const __args = { timeout };
+    let __writer = new BinaryWriter(1024);
+    BotMove.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("bot_move", __argsBuffer, this.setCallReducerFlags.botMoveFlags);
+  }
+
+  onBotMove(callback: (ctx: ReducerEventContext, timeout: BotMoveScheduler) => void) {
+    this.connection.onReducer("bot_move", callback);
+  }
+
+  removeOnBotMove(callback: (ctx: ReducerEventContext, timeout: BotMoveScheduler) => void) {
+    this.connection.offReducer("bot_move", callback);
+  }
+
+  forceStartGame(instanceId: number) {
+    const __args = { instanceId };
+    let __writer = new BinaryWriter(1024);
+    ForceStartGame.getTypeScriptAlgebraicType().serialize(__writer, __args);
+    let __argsBuffer = __writer.getBuffer();
+    this.connection.callReducer("force_start_game", __argsBuffer, this.setCallReducerFlags.forceStartGameFlags);
+  }
+
+  onForceStartGame(callback: (ctx: ReducerEventContext, instanceId: number) => void) {
+    this.connection.onReducer("force_start_game", callback);
+  }
+
+  removeOnForceStartGame(callback: (ctx: ReducerEventContext, instanceId: number) => void) {
+    this.connection.offReducer("force_start_game", callback);
   }
 
   onIdentityDisconnected(callback: (ctx: ReducerEventContext) => void) {
@@ -352,6 +407,16 @@ export class SetReducerFlags {
     this.abandonGameFlags = flags;
   }
 
+  botMoveFlags: CallReducerFlags = 'FullUpdate';
+  botMove(flags: CallReducerFlags) {
+    this.botMoveFlags = flags;
+  }
+
+  forceStartGameFlags: CallReducerFlags = 'FullUpdate';
+  forceStartGame(flags: CallReducerFlags) {
+    this.forceStartGameFlags = flags;
+  }
+
   joinRandomGameFlags: CallReducerFlags = 'FullUpdate';
   joinRandomGame(flags: CallReducerFlags) {
     this.joinRandomGameFlags = flags;
@@ -391,6 +456,10 @@ export class SetReducerFlags {
 
 export class RemoteTables {
   constructor(private connection: DbConnectionImpl) {}
+
+  get botMoveScheduler(): BotMoveSchedulerTableHandle {
+    return new BotMoveSchedulerTableHandle(this.connection.clientCache.getOrCreateTable<BotMoveScheduler>(REMOTE_MODULE.tables.bot_move_scheduler));
+  }
 
   get room(): RoomTableHandle {
     return new RoomTableHandle(this.connection.clientCache.getOrCreateTable<Room>(REMOTE_MODULE.tables.room));
