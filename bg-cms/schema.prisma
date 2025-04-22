@@ -37,6 +37,15 @@ model Tag {
   projects Project[] @relation("Project_tags")
 }
 
+model Page {
+  id            String    @id @default(cuid())
+  title         String    @default("")
+  titleGerman   String    @default("")
+  createdAt     DateTime? @default(now())
+  content       Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+  contentGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
+}
+
 model Project {
   id                     String    @id @default(cuid())
   title                  String    @default("")
@@ -55,5 +64,6 @@ model Project {
   shortDescriptionGerman Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   contentGerman          Json      @default("[{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]}]")
   roomId                 Int?
+  game                   String    @default("")
   tags                   Tag[]     @relation("Project_tags")
 }

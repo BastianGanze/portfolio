@@ -290,6 +290,65 @@ input ProjectRelateToManyForCreateInput {
   connect: [ProjectWhereUniqueInput!]
 }
 
+type Page {
+  id: ID!
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  content: Page_content_Document
+  contentGerman: Page_contentGerman_Document
+}
+
+type Page_content_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+type Page_contentGerman_Document {
+  document(hydrateRelationships: Boolean! = false): JSON!
+}
+
+input PageWhereUniqueInput {
+  id: ID
+}
+
+input PageWhereInput {
+  AND: [PageWhereInput!]
+  OR: [PageWhereInput!]
+  NOT: [PageWhereInput!]
+  id: IDFilter
+  title: StringFilter
+  titleGerman: StringFilter
+  createdAt: DateTimeNullableFilter
+}
+
+input PageOrderByInput {
+  id: OrderDirection
+  title: OrderDirection
+  titleGerman: OrderDirection
+  createdAt: OrderDirection
+}
+
+input PageUpdateInput {
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  content: JSON
+  contentGerman: JSON
+}
+
+input PageUpdateArgs {
+  where: PageWhereUniqueInput!
+  data: PageUpdateInput!
+}
+
+input PageCreateInput {
+  title: String
+  titleGerman: String
+  createdAt: DateTime
+  content: JSON
+  contentGerman: JSON
+}
+
 type Project {
   id: ID!
   title: String
@@ -304,6 +363,7 @@ type Project {
   shortDescriptionGerman: Project_shortDescriptionGerman_Document
   contentGerman: Project_contentGerman_Document
   roomId: Int
+  game: String
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
 }
@@ -356,6 +416,7 @@ input ProjectWhereInput {
   finishedAt: DateTimeNullableFilter
   link: StringFilter
   roomId: IntNullableFilter
+  game: StringFilter
   tags: TagManyRelationFilter
 }
 
@@ -379,6 +440,7 @@ input ProjectOrderByInput {
   finishedAt: OrderDirection
   link: OrderDirection
   roomId: OrderDirection
+  game: OrderDirection
 }
 
 input ProjectUpdateInput {
@@ -394,6 +456,7 @@ input ProjectUpdateInput {
   shortDescriptionGerman: JSON
   contentGerman: JSON
   roomId: Int
+  game: String
   tags: TagRelateToManyForUpdateInput
 }
 
@@ -422,6 +485,7 @@ input ProjectCreateInput {
   shortDescriptionGerman: JSON
   contentGerman: JSON
   roomId: Int
+  game: String
   tags: TagRelateToManyForCreateInput
 }
 
@@ -449,6 +513,12 @@ type Mutation {
   updateTags(data: [TagUpdateArgs!]!): [Tag]
   deleteTag(where: TagWhereUniqueInput!): Tag
   deleteTags(where: [TagWhereUniqueInput!]!): [Tag]
+  createPage(data: PageCreateInput!): Page
+  createPages(data: [PageCreateInput!]!): [Page]
+  updatePage(where: PageWhereUniqueInput!, data: PageUpdateInput!): Page
+  updatePages(data: [PageUpdateArgs!]!): [Page]
+  deletePage(where: PageWhereUniqueInput!): Page
+  deletePages(where: [PageWhereUniqueInput!]!): [Page]
   createProject(data: ProjectCreateInput!): Project
   createProjects(data: [ProjectCreateInput!]!): [Project]
   updateProject(where: ProjectWhereUniqueInput!, data: ProjectUpdateInput!): Project
@@ -487,6 +557,9 @@ type Query {
   tag(where: TagWhereUniqueInput!): Tag
   tags(where: TagWhereInput! = {}, orderBy: [TagOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: TagWhereUniqueInput): [Tag!]
   tagsCount(where: TagWhereInput! = {}): Int
+  page(where: PageWhereUniqueInput!): Page
+  pages(where: PageWhereInput! = {}, orderBy: [PageOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: PageWhereUniqueInput): [Page!]
+  pagesCount(where: PageWhereInput! = {}): Int
   project(where: ProjectWhereUniqueInput!): Project
   projects(where: ProjectWhereInput! = {}, orderBy: [ProjectOrderByInput!]! = [], take: Int, skip: Int! = 0, cursor: ProjectWhereUniqueInput): [Project!]
   projectsCount(where: ProjectWhereInput! = {}): Int

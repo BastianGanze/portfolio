@@ -244,6 +244,8 @@ export type Mutation = {
   __typename?: 'Mutation';
   authenticateUserWithPassword?: Maybe<UserAuthenticationWithPasswordResult>;
   createInitialUser: UserAuthenticationWithPasswordSuccess;
+  createPage?: Maybe<Page>;
+  createPages?: Maybe<Array<Maybe<Page>>>;
   createPost?: Maybe<Post>;
   createPosts?: Maybe<Array<Maybe<Post>>>;
   createProject?: Maybe<Project>;
@@ -252,6 +254,8 @@ export type Mutation = {
   createTags?: Maybe<Array<Maybe<Tag>>>;
   createUser?: Maybe<User>;
   createUsers?: Maybe<Array<Maybe<User>>>;
+  deletePage?: Maybe<Page>;
+  deletePages?: Maybe<Array<Maybe<Page>>>;
   deletePost?: Maybe<Post>;
   deletePosts?: Maybe<Array<Maybe<Post>>>;
   deleteProject?: Maybe<Project>;
@@ -261,6 +265,8 @@ export type Mutation = {
   deleteUser?: Maybe<User>;
   deleteUsers?: Maybe<Array<Maybe<User>>>;
   endSession: Scalars['Boolean']['output'];
+  updatePage?: Maybe<Page>;
+  updatePages?: Maybe<Array<Maybe<Page>>>;
   updatePost?: Maybe<Post>;
   updatePosts?: Maybe<Array<Maybe<Post>>>;
   updateProject?: Maybe<Project>;
@@ -280,6 +286,16 @@ export type MutationAuthenticateUserWithPasswordArgs = {
 
 export type MutationCreateInitialUserArgs = {
   data: CreateInitialUserInput;
+};
+
+
+export type MutationCreatePageArgs = {
+  data: PageCreateInput;
+};
+
+
+export type MutationCreatePagesArgs = {
+  data: Array<PageCreateInput>;
 };
 
 
@@ -323,6 +339,16 @@ export type MutationCreateUsersArgs = {
 };
 
 
+export type MutationDeletePageArgs = {
+  where: PageWhereUniqueInput;
+};
+
+
+export type MutationDeletePagesArgs = {
+  where: Array<PageWhereUniqueInput>;
+};
+
+
 export type MutationDeletePostArgs = {
   where: PostWhereUniqueInput;
 };
@@ -360,6 +386,17 @@ export type MutationDeleteUserArgs = {
 
 export type MutationDeleteUsersArgs = {
   where: Array<UserWhereUniqueInput>;
+};
+
+
+export type MutationUpdatePageArgs = {
+  data: PageUpdateInput;
+  where: PageWhereUniqueInput;
+};
+
+
+export type MutationUpdatePagesArgs = {
+  data: Array<PageUpdateArgs>;
 };
 
 
@@ -424,6 +461,78 @@ export enum OrderDirection {
   Asc = 'asc',
   Desc = 'desc'
 }
+
+export type Page = {
+  __typename?: 'Page';
+  content?: Maybe<Page_Content_Document>;
+  contentGerman?: Maybe<Page_ContentGerman_Document>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+  titleGerman?: Maybe<Scalars['String']['output']>;
+};
+
+export type PageCreateInput = {
+  content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PageOrderByInput = {
+  createdAt?: InputMaybe<OrderDirection>;
+  id?: InputMaybe<OrderDirection>;
+  title?: InputMaybe<OrderDirection>;
+  titleGerman?: InputMaybe<OrderDirection>;
+};
+
+export type PageUpdateArgs = {
+  data: PageUpdateInput;
+  where: PageWhereUniqueInput;
+};
+
+export type PageUpdateInput = {
+  content?: InputMaybe<Scalars['JSON']['input']>;
+  contentGerman?: InputMaybe<Scalars['JSON']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  titleGerman?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PageWhereInput = {
+  AND?: InputMaybe<Array<PageWhereInput>>;
+  NOT?: InputMaybe<Array<PageWhereInput>>;
+  OR?: InputMaybe<Array<PageWhereInput>>;
+  createdAt?: InputMaybe<DateTimeNullableFilter>;
+  id?: InputMaybe<IdFilter>;
+  title?: InputMaybe<StringFilter>;
+  titleGerman?: InputMaybe<StringFilter>;
+};
+
+export type PageWhereUniqueInput = {
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type Page_ContentGerman_Document = {
+  __typename?: 'Page_contentGerman_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Page_ContentGerman_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
+
+export type Page_Content_Document = {
+  __typename?: 'Page_content_Document';
+  document: Scalars['JSON']['output'];
+};
+
+
+export type Page_Content_DocumentDocumentArgs = {
+  hydrateRelationships?: Scalars['Boolean']['input'];
+};
 
 export type PasswordState = {
   __typename?: 'PasswordState';
@@ -545,6 +654,7 @@ export type Project = {
   contentGerman?: Maybe<Project_ContentGerman_Document>;
   createdAt?: Maybe<Scalars['DateTime']['output']>;
   finishedAt?: Maybe<Scalars['DateTime']['output']>;
+  game?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   link?: Maybe<Scalars['String']['output']>;
   mainImage?: Maybe<ImageFieldOutput>;
@@ -577,6 +687,7 @@ export type ProjectCreateInput = {
   contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
   link?: InputMaybe<Scalars['String']['input']>;
   mainImage?: InputMaybe<ImageFieldInput>;
   roomId?: InputMaybe<Scalars['Int']['input']>;
@@ -597,6 +708,7 @@ export type ProjectManyRelationFilter = {
 export type ProjectOrderByInput = {
   createdAt?: InputMaybe<OrderDirection>;
   finishedAt?: InputMaybe<OrderDirection>;
+  game?: InputMaybe<OrderDirection>;
   id?: InputMaybe<OrderDirection>;
   link?: InputMaybe<OrderDirection>;
   roomId?: InputMaybe<OrderDirection>;
@@ -627,6 +739,7 @@ export type ProjectUpdateInput = {
   contentGerman?: InputMaybe<Scalars['JSON']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   finishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  game?: InputMaybe<Scalars['String']['input']>;
   link?: InputMaybe<Scalars['String']['input']>;
   mainImage?: InputMaybe<ImageFieldInput>;
   roomId?: InputMaybe<Scalars['Int']['input']>;
@@ -644,6 +757,7 @@ export type ProjectWhereInput = {
   OR?: InputMaybe<Array<ProjectWhereInput>>;
   createdAt?: InputMaybe<DateTimeNullableFilter>;
   finishedAt?: InputMaybe<DateTimeNullableFilter>;
+  game?: InputMaybe<StringFilter>;
   id?: InputMaybe<IdFilter>;
   link?: InputMaybe<StringFilter>;
   roomId?: InputMaybe<IntNullableFilter>;
@@ -701,6 +815,9 @@ export type Query = {
   __typename?: 'Query';
   authenticatedItem?: Maybe<AuthenticatedItem>;
   keystone: KeystoneMeta;
+  page?: Maybe<Page>;
+  pages?: Maybe<Array<Page>>;
+  pagesCount?: Maybe<Scalars['Int']['output']>;
   post?: Maybe<Post>;
   posts?: Maybe<Array<Post>>;
   postsCount?: Maybe<Scalars['Int']['output']>;
@@ -713,6 +830,25 @@ export type Query = {
   user?: Maybe<User>;
   users?: Maybe<Array<User>>;
   usersCount?: Maybe<Scalars['Int']['output']>;
+};
+
+
+export type QueryPageArgs = {
+  where: PageWhereUniqueInput;
+};
+
+
+export type QueryPagesArgs = {
+  cursor?: InputMaybe<PageWhereUniqueInput>;
+  orderBy?: Array<PageOrderByInput>;
+  skip?: Scalars['Int']['input'];
+  take?: InputMaybe<Scalars['Int']['input']>;
+  where?: PageWhereInput;
+};
+
+
+export type QueryPagesCountArgs = {
+  where?: PageWhereInput;
 };
 
 
