@@ -26,6 +26,7 @@ pub struct UserGameScores {
 }
 
 #[table(name = user, public)]
+#[derive(Debug)]
 pub struct User {
     #[primary_key]
     identity: Identity,
@@ -339,6 +340,7 @@ pub fn increase_player_score_by_outcome(
     outcome: GameOutcome,
 ) {
     if let Some(user) = ctx.db.user().identity().find(player_identity) {
+        log::info!("User found for increasing score: {:?} {:?}", user, outcome);
         let mut game_scores = user.game_scores.clone();
         let game_score_index = match game_scores
             .iter()
@@ -575,6 +577,12 @@ pub fn force_start_game(ctx: &ReducerContext, instance_id: GameInstanceId) {
 #[reducer]
 pub fn join_random_game(ctx: &ReducerContext, game_param: DbBoardGameParam) {
     if let Some(mut game_instance) = find_free_game_instance(ctx, game_param) {
+        if game_instance.player_one == Some(ctx.sender)
+            || game_instance.player_two == Some(ctx.sender)
+        {
+            log::error!("Player already in this game instance!");
+            return;
+        }
         if game_instance.player_one.is_none() {
             game_instance.player_one = Some(ctx.sender);
         } else {

@@ -12,12 +12,14 @@ import type {
   VersusGameInstance,
 } from '~/bindings'
 import { DbConnection } from '~/bindings'
+import { Deferred } from '~/utils'
 
 export const useGameStore = defineStore('gameStore', () => {
-  const connected = ref(false)
   const currentUserId = ref<string | null>(null)
   const users = ref<Record<string, User & { colorClass: string }>>({})
   const userCursors = ref<{ [key: string]: UserCursor }>({})
+  const connected = new Deferred()
+  const isConnected = ref(false)
   let dbConn: DbConnection | null = null
   const authToken = useCookie<string>('gameAuthToken', { default: () => '' })
   const rooms = ref<Record<number, Room>>({})
@@ -62,7 +64,8 @@ export const useGameStore = defineStore('gameStore', () => {
       token: string,
     ) => {
       currentUserId.value = id.toHexString()
-      connected.value = true
+      connected.resolve()
+      isConnected.value = true
       authToken.value = token
       conn
         ?.subscriptionBuilder()
@@ -77,25 +80,27 @@ export const useGameStore = defineStore('gameStore', () => {
     }
 
     const onDisconnect = () => {
-      connected.value = false
+      isConnected.value = false
     }
 
     const connectDb = () => {
       dbConn = DbConnection.builder()
-        .withUri('ws://127.0.0.1:3000')
+        .withUri('wss://spacetime.bastianganze.me')
         .withModuleName('tic-tac-toe')
         .withToken(authToken.value)
         .onConnect(onConnect)
         .onDisconnect(onDisconnect)
         .onConnectError((_ctx: ErrorContext, err: Error) => {
-          if (err.message?.includes('Unauthorized')) {
+          console.error('connect error?')
+          if (err.message?.includes('Failed to verify token')) {
             authToken.value = ''
             connectDb()
           }
           else {
             console.error('Error connecting', err)
           }
-          connected.value = false
+          connected.reject()
+          isConnected.value = false
         })
         .build()
 
@@ -108,7 +113,7 @@ export const useGameStore = defineStore('gameStore', () => {
 
       dbConn.db.user.onUpdate((_ctx, oldRow, newRow) => {
         const id = newRow.identity.toHexString()
-        if (!oldRow.online && newRow.online) {
+        if (newRow.online) {
           users.value[id] = { ...newRow, colorClass: `col-${hashIdToRange(id, 8)}` }
         }
         if (oldRow.online && !newRow.online) {
@@ -160,55 +165,48 @@ export const useGameStore = defineStore('gameStore', () => {
       })
 
       moveUser = (pos: DbVector2) => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.movePosition(pos)
+        connected.promise.then(() => {
+          dbConn!.reducers.movePosition(pos)
+        })
       }
 
       setCurrentRoomId = (id: number) => {
-        if (!connected.value) {
-          return
-        }
-        currentRoomId = id
-        dbConn!.reducers.moveToRoom(id)
-        subToRoom(currentRoomId)
-        userCursors.value = {}
+        connected.promise.then(() => {
+          currentRoomId = id
+          dbConn!.reducers.moveToRoom(id)
+          subToRoom(currentRoomId)
+          userCursors.value = {}
+        })
       }
 
       joinRandomGame = (gameParam: DbBoardGameParam) => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.joinRandomGame(gameParam)
+        connected.promise.then(() => {
+          dbConn!.reducers.joinRandomGame(gameParam)
+        })
       }
 
       makeRandomBoardGameMove = (instanceId: number) => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.makeRandomBoardGameMove(instanceId)
+        connected.promise.then(() => {
+          dbConn!.reducers.makeRandomBoardGameMove(instanceId)
+        })
       }
 
       makeBoardGameMove = (instanceId: number, boardGameMove: DbBoardGameMove) => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.makeBoardGameMove(instanceId, boardGameMove)
+        connected.promise.then(() => {
+          dbConn!.reducers.makeBoardGameMove(instanceId, boardGameMove)
+        })
       }
 
       abandonGame = () => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.abandonGame()
+        connected.promise.then(() => {
+          dbConn!.reducers.abandonGame()
+        })
       }
 
       forceStartGame = (instanceId: number) => {
-        if (!connected.value) {
-          return
-        }
-        dbConn!.reducers.forceStartGame(instanceId)
+        connected.promise.then(() => {
+          dbConn!.reducers.forceStartGame(instanceId)
+        })
       }
     }
     connectDb()

@@ -1,23 +1,15 @@
 <script setup lang="ts">
-import type { SlateNode } from '~/components/RichText'
+import type { Project } from '~/__generated__/graphql'
 import { GET_PROJECTS } from '~/queries'
 
 const { t } = useLocalizationStore()
 const { locale } = storeToRefs(useLocalizationStore())
 const { data } = await useAsyncQuery({
   query: GET_PROJECTS,
+  variables: {
+    where: {},
+  },
 })
-
-interface Project {
-  id: string
-  title: string
-  link: string | null
-  shortDescription?: SlateNode[]
-  mainImage?: { url?: string } | null
-  startedAt: Date | null
-  finishedAt: Date | null
-  roomId: number
-}
 
 const { rooms } = storeToRefs(useGameStore())
 
@@ -28,11 +20,13 @@ const projects = computed(() => {
       startedAt: p.startedAt ? new Date(p.startedAt) : null,
       finishedAt: p.finishedAt ? new Date(p.finishedAt) : null,
       title: locale.value === 'en' ? p.title! : p.titleGerman!,
-      mainImage: p.mainImage,
+      mainImage: p.mainImage ? { url: p.mainImage.url } : null,
       link: p.link || null,
       shortDescription: locale.value === 'en' ? p.shortDescription?.document : p.shortDescriptionGerman?.document,
       roomId: p.roomId ?? 0,
-    } satisfies Project
+    } satisfies Omit<Project, 'mainImage'> & {
+      mainImage: { url: string } | null
+    }
   })
   p?.sort((a, b) => {
     if (a.startedAt && b.startedAt) {
@@ -108,7 +102,7 @@ const projects = computed(() => {
   flex-grow: 1;
   border-radius: 2px;
   margin: 9px 0 5px 0;
-  background-color: #ffffff;
+  background-color: var(--color-base-content);
 }
 
 .timeline-middle-custom {

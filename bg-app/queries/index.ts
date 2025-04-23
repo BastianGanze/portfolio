@@ -21,8 +21,8 @@ export const GET_POSTS = gql(/* GraphQL */`
     }`)
 
 export const GET_PROJECTS = gql(/* GraphQL */`
-    query Query {
-        projects {
+    query Query($where: ProjectWhereInput!) {
+        projects(where: $where) {
             content {
                 document
             }
@@ -42,6 +42,7 @@ export const GET_PROJECTS = gql(/* GraphQL */`
                 document
             }
             roomId
+            game
             startedAt
             title
             titleGerman

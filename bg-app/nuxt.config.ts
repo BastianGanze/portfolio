@@ -50,6 +50,7 @@ export default defineNuxtConfig({
         output: {
           manualChunks: {
             connections: ['@clockworklabs/spacetimedb-sdk', '@apollo/client'],
+            playful: ['canvas-confetti'],
           },
         },
       },

@@ -19,7 +19,7 @@ watch(themeName, () => {
     : 'line-md:moon-filled-to-sunny-filled-loop-transition'
 })
 const { moveUser, setCurrentRoomId } = useGameStore()
-const { userCursors, users, currentUserId, gameInstances } = storeToRefs(useGameStore())
+const { userCursors, users } = storeToRefs(useGameStore())
 const mainNode = ref<HTMLElement>()
 const mainNodeDimensions = ref({ left: 0, top: 0, width: 0, height: 0 })
 let lastCursorPosition = { clientX: 0, clientY: 0 }
@@ -84,18 +84,10 @@ function onTouch(event: TouchEvent) {
       ref="mainNode" class="main relative w-9/10" @mousemove="onMove" @touchstart="onTouch" @touchmove="onTouch"
       @touchend="onTouch"
     >
-      <GameBoardManager
-        v-if="currentUserId"
-        :board-game-param="{ tag: 'TicTacToe' }" :current-user-id="currentUserId"
-        :game-instances="gameInstances"
-      />
       <div class="navbar">
         <div class="navbar-start gap-3">
           <NuxtLink to="/" aria-label="Go to main page" class="btn btn-ghost btn-circle">
             <Icon name="line-md:home-md" size="2rem" />
-          </NuxtLink>
-          <NuxtLink aria-label="Go to games" to="/games" class="btn btn-ghost btn-circle">
-            <Icon name="line-md:play-filled" size="2rem" />
           </NuxtLink>
         </div>
         <div class="navbar-end gap-3">
