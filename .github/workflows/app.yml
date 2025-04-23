@@ -43,4 +43,4 @@ jobs:
           version: ${{ steps.get_version.outputs.VERSION }}
           build-args: |
             GRAPHQL_ENDPOINT=https://control.bastianganze.me/api/graphql
-            SPACETIME_ENDPOINT=https://spacetime.bastianganze.me
+            SPACETIME_ENDPOINT=wss://spacetime.bastianganze.me
