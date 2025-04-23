@@ -141,7 +141,6 @@ function onTouch(event: TouchEvent) {
             name="line-md:account-small"
             size="2rem"
           />
-          <span class="cursor-name">{{ users[id].name }}</span>
         </div>
       </div>
     </div>
