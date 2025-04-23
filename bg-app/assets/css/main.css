@@ -78,4 +78,5 @@
 html, body, #__nuxt {
     height: 100%;
     min-height: 100%;
+    font-family: var(--default-font-family), sans-serif;
 }
