@@ -11,6 +11,15 @@ RUN if [ "$GRAPHQL_ENDPOINT" = "__NOT_PROVIDED__" ]; then \
       exit 1; \
     fi
 
+ARG SPACETIME_ENDPOINT=__NOT_PROVIDED__
+
+ENV SPACETIME_ENDPOINT=$SPACETIME_ENDPOINT
+
+RUN if [ "$SPACETIME_ENDPOINT" = "__NOT_PROVIDED__" ]; then \
+      echo "ERROR: SPACETIME_ENDPOINT build argument is required" && \
+      exit 1; \
+    fi
+
 WORKDIR /app
 COPY . ./
 

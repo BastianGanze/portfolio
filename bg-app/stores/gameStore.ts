@@ -18,7 +18,7 @@ export const useGameStore = defineStore('gameStore', () => {
   const currentUserId = ref<string | null>(null)
   const users = ref<Record<string, User & { colorClass: string }>>({})
   const userCursors = ref<{ [key: string]: UserCursor }>({})
-  const connected = new Deferred()
+  let connected = new Deferred()
   const isConnected = ref(false)
   let dbConn: DbConnection | null = null
   const authToken = useCookie<string>('gameAuthToken', { default: () => '' })
@@ -26,6 +26,7 @@ export const useGameStore = defineStore('gameStore', () => {
   const gameInstances = ref<Record<number, VersusGameInstance>>({})
   let currentRoomId = 0
   let cursorSubscription: null | { unsubscribe: () => void } = null
+  const runtimeConfig = useRuntimeConfig()
 
   function hashIdToRange(id: string, range: number) {
     const hash = id.split('').reduce((acc, char) => {
@@ -84,14 +85,14 @@ export const useGameStore = defineStore('gameStore', () => {
     }
 
     const connectDb = () => {
+      connected = new Deferred()
       dbConn = DbConnection.builder()
-        .withUri('wss://spacetime.bastianganze.me')
+        .withUri(runtimeConfig.public.spacetimeEndpoint)
         .withModuleName('tic-tac-toe')
         .withToken(authToken.value)
         .onConnect(onConnect)
         .onDisconnect(onDisconnect)
         .onConnectError((_ctx: ErrorContext, err: Error) => {
-          console.error('connect error?')
           if (err.message?.includes('Failed to verify token')) {
             authToken.value = ''
             connectDb()

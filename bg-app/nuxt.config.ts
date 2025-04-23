@@ -8,6 +8,11 @@ export default defineNuxtConfig({
   devServer: {
     port: 8081,
   },
+  runtimeConfig: {
+    public: {
+      spacetimeEndpoint: process.env.SPACETIME_ENDPOINT || 'ws://127.0.0.1:3000',
+    },
+  },
   app: {
     head: {
       title: 'Bastian Ganze',
