@@ -55,19 +55,30 @@ function showWonEffect() {
   setTimeout(shootConfetti, 1000)
 }
 
-const seekRunningGame = ref(true)
-watch([gameInstances, seekRunningGame], () => {
-  if (seekRunningGame.value) {
-    const playerInstancesForGame = Object.values(gameInstances.value).filter(instance => (instance.playerOne?.toHexString() === currentUserId.value || instance.playerTwo?.toHexString() === currentUserId.value) && instance.gameStateParam.tag === boardGameParam.value.tag)
-    playerInstancesForGame.sort((a, b) =>
-      Number(a.gameDone) - Number(b.gameDone),
-    )
-    if (playerInstancesForGame.length > 0 && !playerInstancesForGame[0].gameDone) {
-      activeInstanceId.value = playerInstancesForGame[0].id
-      seekRunningGame.value = false
-    }
+const seekRunningGameSignal = ref(true)
+
+function seekRunningGame() {
+  const playerInstancesForGame = Object.values(gameInstances.value).filter(instance => (instance.playerOne?.toHexString() === currentUserId.value || instance.playerTwo?.toHexString() === currentUserId.value) && instance.gameStateParam.tag === boardGameParam.value.tag)
+  playerInstancesForGame.sort((a, b) =>
+    Number(a.gameDone) - Number(b.gameDone),
+  )
+  if (playerInstancesForGame.length > 0 && !playerInstancesForGame[0].gameDone) {
+    activeInstanceId.value = playerInstancesForGame[0].id
+    seekRunningGameSignal.value = false
+  }
+}
+
+watch([gameInstances, seekRunningGameSignal], () => {
+  if (seekRunningGameSignal.value) {
+    seekRunningGame()
   }
 }, { deep: true })
+
+onMounted(() => {
+  if (seekRunningGameSignal.value) {
+    seekRunningGame()
+  }
+})
 
 const playerScore = computed((): UserGameScores => {
   return users.value[currentUserId.value]?.gameScores.find(score => score.game.tag === boardGameParam.value.tag) || {
@@ -82,7 +93,7 @@ const { joinRandomGame, abandonGame, forceStartGame } = useGameStore()
 
 function joinGame() {
   activeInstanceId.value = null
-  seekRunningGame.value = true
+  seekRunningGameSignal.value = true
   joinRandomGame(boardGameParam.value)
 }
 
