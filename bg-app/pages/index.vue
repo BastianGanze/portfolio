@@ -1,20 +1,31 @@
 <script setup lang="ts">
 import type { Project } from '~/__generated__/graphql'
-import { GET_PROJECTS } from '~/queries'
+import { GET_PAGES, GET_PROJECTS } from '~/queries'
 
 const { t } = useLocalizationStore()
 const { locale } = storeToRefs(useLocalizationStore())
-const { data } = await useAsyncQuery({
+const { data: projectData } = await useAsyncQuery({
   query: GET_PROJECTS,
   variables: {
     where: {},
   },
 })
 
+const { data: pageData } = await useAsyncQuery({
+  query: GET_PAGES,
+  variables: {
+    where: {
+      name: {
+        equals: 'projects',
+      },
+    },
+  },
+})
+
 const { rooms } = storeToRefs(useGameStore())
 
 const projects = computed(() => {
-  const p = data.value?.projects?.map((p) => {
+  const p = projectData.value?.projects?.map((p) => {
     return {
       id: p.id,
       startedAt: p.startedAt ? new Date(p.startedAt) : null,
@@ -36,19 +47,27 @@ const projects = computed(() => {
   })
   return p
 })
+
+const page = computed(() => {
+  if (pageData.value?.pages?.length !== 1) {
+    return null
+  }
+  const p = pageData.value.pages[0]
+  return {
+    id: p.id,
+    name: p.name,
+    title: locale.value === 'en' ? p.title : p.titleGerman,
+    document: locale.value === 'en' ? p.content?.document : p.contentGerman?.document,
+  }
+})
 </script>
 
 <template>
   <div class="card card-border border-base-300 bg-base-100 w-full">
     <div class="card-body">
-      <article class="prose">
-        <h2>Hey there!</h2>
-        <p>
-          My name is <strong>Bastian Ganze</strong>. My current endeavours focus on my love for <a
-            aria-label="Link to the rust programming langauge" href="https://www.rust-lang.org/"
-          >Rust</a> and game
-          design as well as building a web/android app with Vue.js and Capacitor.
-        </p>
+      <article v-if="page" class="prose">
+        <h2>{{ page }}</h2>
+        <RichText :document="page?.document" />
       </article>
       <div class="relative flex py-5 items-center">
         <div class="flex-grow border-t border-gray-400" />

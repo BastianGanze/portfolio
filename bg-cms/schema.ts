@@ -113,6 +113,7 @@ export const lists = {
       },
     },
     fields: {
+      name: text({ validation: { isRequired: true } }),
       title: text({ validation: { isRequired: true } }),
       titleGerman: text({ validation: { isRequired: true } }),
       createdAt: timestamp({

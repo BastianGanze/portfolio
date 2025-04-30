@@ -20,8 +20,25 @@ export const GET_POSTS = gql(/* GraphQL */`
         }
     }`)
 
+export const GET_PAGES = gql(/* GraphQL */`
+    query getPages($where: PageWhereInput!) {
+        pages(where: $where) {
+            id
+            name
+            title
+            titleGerman
+            content {
+                document
+            }
+            contentGerman {
+                document
+            }
+        }
+    }
+`)
+
 export const GET_PROJECTS = gql(/* GraphQL */`
-    query Query($where: ProjectWhereInput!) {
+    query getProjects($where: ProjectWhereInput!) {
         projects(where: $where) {
             content {
                 document

@@ -39,6 +39,7 @@ model Tag {
 
 model Page {
   id            String    @id @default(cuid())
+  name          String    @default("")
   title         String    @default("")
   titleGerman   String    @default("")
   createdAt     DateTime? @default(now())

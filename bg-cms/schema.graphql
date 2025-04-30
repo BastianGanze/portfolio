@@ -292,6 +292,7 @@ input ProjectRelateToManyForCreateInput {
 
 type Page {
   id: ID!
+  name: String
   title: String
   titleGerman: String
   createdAt: DateTime
@@ -316,6 +317,7 @@ input PageWhereInput {
   OR: [PageWhereInput!]
   NOT: [PageWhereInput!]
   id: IDFilter
+  name: StringFilter
   title: StringFilter
   titleGerman: StringFilter
   createdAt: DateTimeNullableFilter
@@ -323,12 +325,14 @@ input PageWhereInput {
 
 input PageOrderByInput {
   id: OrderDirection
+  name: OrderDirection
   title: OrderDirection
   titleGerman: OrderDirection
   createdAt: OrderDirection
 }
 
 input PageUpdateInput {
+  name: String
   title: String
   titleGerman: String
   createdAt: DateTime
@@ -342,6 +346,7 @@ input PageUpdateArgs {
 }
 
 input PageCreateInput {
+  name: String
   title: String
   titleGerman: String
   createdAt: DateTime
