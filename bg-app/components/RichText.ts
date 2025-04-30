@@ -66,7 +66,7 @@ function renderNode(node: SlateNode, key: number, parent?: SlateNode): VNode {
         const index = layoutParent.children.indexOf(node)
         const layout = layoutParent.layout
         const colSpan = layout[index]
-        return h('div', { key, class: `col-span-${colSpan}` }, children)
+        return h('div', { key, class: `col-span-${colSpan} flex` }, children)
       }
       return h('div', { key, class: 'col-span-1' }, children)
     })
@@ -82,7 +82,11 @@ function renderContentNode(node: TextNode, key: number): VNode {
     const imgContent = content.split('{{')[1].split('}}')[0]
     const imgSrc = imgContent.split(',')[0].replace('img=', '').trim()
     const imgAlt = imgContent.split(',')[1].replace('alt=', '').trim()
-    return h('img', { key, src: imgSrc, alt: imgAlt, class: 'max-w-full' })
+    return h('span', { key, class: 'h-full flex justify-content' }, [h('img', {
+      src: imgSrc,
+      alt: imgAlt,
+      class: 'object-contain',
+    })])
   }
 
   if (!content) {

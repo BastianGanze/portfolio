@@ -60,6 +60,10 @@ const page = computed(() => {
     document: locale.value === 'en' ? p.content?.document : p.contentGerman?.document,
   }
 })
+
+function getUsersInRoom(roomId: number) {
+  return rooms.value[roomId]?.users ?? 0
+}
 </script>
 
 <template>
@@ -98,8 +102,14 @@ const page = computed(() => {
               </h2>
               <RichText :document="project.shortDescription" />
               <NuxtLink :to="`/project/${project.roomId}`">
-                {{ t('projectGetMoreInfoLink') }} {{ rooms[project.roomId]?.users ?? 0 }}
+                {{ t('projectGetMoreInfoLink') }}
               </NuxtLink>
+              <span
+                class="badge badge-sm mx-1"
+                :class="{ 'badge-ghost': getUsersInRoom(project.roomId) === 0, 'badge-primary': getUsersInRoom(project.roomId) > 0 }"
+              >
+                {{ t('playersInsideRoomBadgeLabel', { count: getUsersInRoom(project.roomId) }) }}
+              </span>
             </article>
           </div>
           <div

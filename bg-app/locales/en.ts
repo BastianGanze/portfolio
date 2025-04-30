@@ -27,4 +27,8 @@ export const en = {
   gameBoardOutcomeWin: 'You win!',
   gameBoardOutcomeLose: 'You lost!',
   gameBoardOutcomeDraw: 'The game ends in a draw!',
+  playersInsideRoomBadgeLabel: {
+    one: '1 player inside',
+    other: '%{count} players inside',
+  },
 }

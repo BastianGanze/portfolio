@@ -29,4 +29,8 @@ export const de = {
   gameBoardOutcomeWin: 'Du hast gewonnen!',
   gameBoardOutcomeLose: 'Du hast verloren!',
   gameBoardOutcomeDraw: 'Das Spiel endet unentschieden!',
+  playersInsideRoomBadgeLabel: {
+    one: '1 Spieler im Raum',
+    other: '%{count} Spieler im Raum',
+  },
 } satisfies typeof en

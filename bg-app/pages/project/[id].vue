@@ -20,20 +20,27 @@ const { data } = await useAsyncQuery({
     },
   },
 })
-const { locale } = storeToRefs(useLocalizationStore())
-const project = computed(() => data.value?.projects?.map(p => ({
-  id: p.id,
-  startedAt: p.startedAt ? new Date(p.startedAt) : null,
-  finishedAt: p.finishedAt ? new Date(p.finishedAt) : null,
-  title: locale.value === 'en' ? p.title! : p.titleGerman!,
-  mainImage: p.mainImage || null,
-  link: p.link || null,
-  game: p.game || null,
-  content: locale.value === 'en' ? p.content?.document : p.contentGerman?.document,
-  roomId: p.roomId ?? 0,
-} satisfies Omit<Project, 'mainImage'> & {
+type LocalProjectType = Omit<Project, 'mainImage'> & {
   mainImage: { url: string } | null
-}))?.[0] ?? null)
+}
+const { locale } = storeToRefs(useLocalizationStore())
+const project = computed(() => {
+  if (!data.value?.projects || data.value.projects.length !== 1) {
+    return null
+  }
+  const p = data.value.projects[0]
+  return {
+    id: p.id,
+    startedAt: p.startedAt ? new Date(p.startedAt) : null,
+    finishedAt: p.finishedAt ? new Date(p.finishedAt) : null,
+    title: locale.value === 'en' ? p.title! : p.titleGerman!,
+    mainImage: p.mainImage || null,
+    link: p.link || null,
+    game: p.game || null,
+    content: locale.value === 'en' ? p.content?.document : p.contentGerman?.document,
+    roomId: p.roomId ?? 0,
+  } satisfies LocalProjectType
+})
 
 const gameToPlay = computed(() => possibleGames.find(game => game.tag === project.value?.game) ?? null)
 </script>
@@ -43,7 +50,17 @@ const gameToPlay = computed(() => possibleGames.find(game => game.tag === projec
     <div class="card card-border border-base-300 bg-base-100 card-xl w-full">
       <div class="card-body">
         <article v-if="project" class="prose">
-          <h2>{{ project.title }}</h2>
+          <h2>
+            <a v-if="project.link" class="no-underline font-bold" :href="project.link">{{ project.title }}
+              <Icon size="0.8em" class="inline-block ml-1" name="line-md:link" />
+            </a>
+            <span v-else>{{ project.title }}</span>
+            <span class="text-sm block text-gray-400">
+              {{
+                $dayjs(project.startedAt).format('MMMM YYYY')
+              }}{{ project.finishedAt ? ` - ${$dayjs(project.finishedAt).format('MMMM YYYY')}` : '' }}
+            </span>
+          </h2>
           <RichText :document="project.content" />
         </article>
         <GameBoardManager
