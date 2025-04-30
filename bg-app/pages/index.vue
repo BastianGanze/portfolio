@@ -66,7 +66,7 @@ const page = computed(() => {
   <div class="card card-border border-base-300 bg-base-100 w-full">
     <div class="card-body">
       <article v-if="page" class="prose">
-        <h2>{{ page }}</h2>
+        <h2>{{ page.title }}</h2>
         <RichText :document="page?.document" />
       </article>
       <div class="relative flex py-5 items-center">
