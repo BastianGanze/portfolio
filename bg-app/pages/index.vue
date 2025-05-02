@@ -69,7 +69,7 @@ function getUsersInRoom(roomId: number) {
 <template>
   <div class="card card-border border-base-300 bg-base-100 w-full">
     <div class="card-body">
-      <article v-if="page" class="prose">
+      <article v-if="page" class="prose max-w-none">
         <h2>{{ page.title }}</h2>
         <RichText :document="page?.document" />
       </article>

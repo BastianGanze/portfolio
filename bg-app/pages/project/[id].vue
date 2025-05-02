@@ -49,7 +49,7 @@ const gameToPlay = computed(() => possibleGames.find(game => game.tag === projec
   <div>
     <div class="card card-border border-base-300 bg-base-100 card-xl w-full">
       <div class="card-body">
-        <article v-if="project" class="prose">
+        <article v-if="project" class="prose max-w-none">
           <h2>
             <a v-if="project.link" class="no-underline font-bold" :href="project.link">{{ project.title }}
               <Icon size="0.8em" class="inline-block ml-1" name="line-md:link" />
@@ -65,6 +65,7 @@ const gameToPlay = computed(() => possibleGames.find(game => game.tag === projec
         </article>
         <GameBoardManager
           v-if="currentUserId && gameToPlay"
+          class="mt-5"
           :board-game-param="gameToPlay" :current-user-id="currentUserId"
           :game-instances="gameInstances"
         />

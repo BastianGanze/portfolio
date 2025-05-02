@@ -211,7 +211,7 @@ function onTouch(event: TouchEvent) {
 
 .main {
   position: relative;
-  max-width: 1080px;
+  max-width: 860px;
 }
 
 .bg-footer {

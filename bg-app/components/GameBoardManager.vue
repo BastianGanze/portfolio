@@ -279,6 +279,7 @@ function onActionButtonClick() {
   flex-grow: 1;
   position: relative;
   min-height: 200px;
+  min-width: 200px;
 }
 
 .board-score {

@@ -85,7 +85,7 @@ function renderContentNode(node: TextNode, key: number): VNode {
     return h('span', { key, class: 'h-full flex justify-content' }, [h('img', {
       src: imgSrc,
       alt: imgAlt,
-      class: 'object-contain',
+      class: 'object-contain mt-0 mb-0',
     })])
   }
 
