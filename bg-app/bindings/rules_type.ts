@@ -32,37 +32,30 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
-import { Player as __Player } from "./player_type";
-import { Outcome as __Outcome } from "./outcome_type";
-
-export type TttBoard = {
-  tiles: __Player | undefined[],
-  nextPlayer: __Player,
-  outcome: __Outcome | undefined,
+export type Rules = {
+  allowMultiStoneSuicide: boolean,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace TttBoard {
+export namespace Rules {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("tiles", AlgebraicType.createArrayType(AlgebraicType.createOptionType(__Player.getTypeScriptAlgebraicType()))),
-      new ProductTypeElement("nextPlayer", __Player.getTypeScriptAlgebraicType()),
-      new ProductTypeElement("outcome", AlgebraicType.createOptionType(__Outcome.getTypeScriptAlgebraicType())),
+      new ProductTypeElement("allowMultiStoneSuicide", AlgebraicType.createBoolType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: TttBoard): void {
-    TttBoard.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: Rules): void {
+    Rules.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): TttBoard {
-    return TttBoard.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): Rules {
+    return Rules.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

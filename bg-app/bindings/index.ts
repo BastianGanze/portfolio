@@ -46,8 +46,6 @@ import { JoinRandomGame } from "./join_random_game_reducer.ts";
 export { JoinRandomGame };
 import { MakeBoardGameMove } from "./make_board_game_move_reducer.ts";
 export { MakeBoardGameMove };
-import { MakeRandomBoardGameMove } from "./make_random_board_game_move_reducer.ts";
-export { MakeRandomBoardGameMove };
 import { MovePosition } from "./move_position_reducer.ts";
 export { MovePosition };
 import { MoveToRoom } from "./move_to_room_reducer.ts";
@@ -62,6 +60,8 @@ export { UserConnected };
 // Import and reexport all table handle types
 import { BotMoveSchedulerTableHandle } from "./bot_move_scheduler_table.ts";
 export { BotMoveSchedulerTableHandle };
+import { GoBoardHistoryTableHandle } from "./go_board_history_table.ts";
+export { GoBoardHistoryTableHandle };
 import { RoomTableHandle } from "./room_table.ts";
 export { RoomTableHandle };
 import { TimeoutUserScheduleTableHandle } from "./timeout_user_schedule_table.ts";
@@ -76,6 +76,10 @@ export { VersusGameInstanceTableHandle };
 // Import and reexport all types
 import { BotMoveScheduler } from "./bot_move_scheduler_type.ts";
 export { BotMoveScheduler };
+import { Chains } from "./chains_type.ts";
+export { Chains };
+import { Connect4 } from "./connect_4_type.ts";
+export { Connect4 };
 import { Coord } from "./coord_type.ts";
 export { Coord };
 import { DbBoardGame } from "./db_board_game_type.ts";
@@ -86,14 +90,38 @@ import { DbBoardGameParam } from "./db_board_game_param_type.ts";
 export { DbBoardGameParam };
 import { DbVector2 } from "./db_vector_2_type.ts";
 export { DbVector2 };
+import { GoBoardHistory } from "./go_board_history_type.ts";
+export { GoBoardHistory };
+import { Group } from "./group_type.ts";
+export { Group };
+import { Komi } from "./komi_type.ts";
+export { Komi };
+import { LinkHead } from "./link_head_type.ts";
+export { LinkHead };
+import { LinkNode } from "./link_node_type.ts";
+export { LinkNode };
+import { Move } from "./move_type.ts";
+export { Move };
+import { OptionU16 } from "./option_u_16_type.ts";
+export { OptionU16 };
 import { Outcome } from "./outcome_type.ts";
 export { Outcome };
 import { Player } from "./player_type.ts";
 export { Player };
 import { Room } from "./room_type.ts";
 export { Room };
+import { Rules } from "./rules_type.ts";
+export { Rules };
+import { SpacetimeGoBoard } from "./spacetime_go_board_type.ts";
+export { SpacetimeGoBoard };
+import { State } from "./state_type.ts";
+export { State };
 import { TttBoard } from "./ttt_board_type.ts";
 export { TttBoard };
+import { Tile } from "./tile_type.ts";
+export { Tile };
+import { TileContent } from "./tile_content_type.ts";
+export { TileContent };
 import { TimeoutUserSchedule } from "./timeout_user_schedule_type.ts";
 export { TimeoutUserSchedule };
 import { User } from "./user_type.ts";
@@ -104,6 +132,8 @@ import { UserGameScores } from "./user_game_scores_type.ts";
 export { UserGameScores };
 import { VersusGameInstance } from "./versus_game_instance_type.ts";
 export { VersusGameInstance };
+import { Zobrist } from "./zobrist_type.ts";
+export { Zobrist };
 
 const REMOTE_MODULE = {
   tables: {
@@ -111,6 +141,11 @@ const REMOTE_MODULE = {
       tableName: "bot_move_scheduler",
       rowType: BotMoveScheduler.getTypeScriptAlgebraicType(),
       primaryKey: "scheduledId",
+    },
+    go_board_history: {
+      tableName: "go_board_history",
+      rowType: GoBoardHistory.getTypeScriptAlgebraicType(),
+      primaryKey: "id",
     },
     room: {
       tableName: "room",
@@ -162,10 +197,6 @@ const REMOTE_MODULE = {
     make_board_game_move: {
       reducerName: "make_board_game_move",
       argsType: MakeBoardGameMove.getTypeScriptAlgebraicType(),
-    },
-    make_random_board_game_move: {
-      reducerName: "make_random_board_game_move",
-      argsType: MakeRandomBoardGameMove.getTypeScriptAlgebraicType(),
     },
     move_position: {
       reducerName: "move_position",
@@ -220,7 +251,6 @@ export type Reducer = never
 | { name: "IdentityDisconnected", args: IdentityDisconnected }
 | { name: "JoinRandomGame", args: JoinRandomGame }
 | { name: "MakeBoardGameMove", args: MakeBoardGameMove }
-| { name: "MakeRandomBoardGameMove", args: MakeRandomBoardGameMove }
 | { name: "MovePosition", args: MovePosition }
 | { name: "MoveToRoom", args: MoveToRoom }
 | { name: "SayHello", args: SayHello }
@@ -313,22 +343,6 @@ export class RemoteReducers {
 
   removeOnMakeBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number, mv: DbBoardGameMove) => void) {
     this.connection.offReducer("make_board_game_move", callback);
-  }
-
-  makeRandomBoardGameMove(gameInstanceId: number) {
-    const __args = { gameInstanceId };
-    let __writer = new BinaryWriter(1024);
-    MakeRandomBoardGameMove.getTypeScriptAlgebraicType().serialize(__writer, __args);
-    let __argsBuffer = __writer.getBuffer();
-    this.connection.callReducer("make_random_board_game_move", __argsBuffer, this.setCallReducerFlags.makeRandomBoardGameMoveFlags);
-  }
-
-  onMakeRandomBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number) => void) {
-    this.connection.onReducer("make_random_board_game_move", callback);
-  }
-
-  removeOnMakeRandomBoardGameMove(callback: (ctx: ReducerEventContext, gameInstanceId: number) => void) {
-    this.connection.offReducer("make_random_board_game_move", callback);
   }
 
   movePosition(position: DbVector2) {
@@ -427,11 +441,6 @@ export class SetReducerFlags {
     this.makeBoardGameMoveFlags = flags;
   }
 
-  makeRandomBoardGameMoveFlags: CallReducerFlags = 'FullUpdate';
-  makeRandomBoardGameMove(flags: CallReducerFlags) {
-    this.makeRandomBoardGameMoveFlags = flags;
-  }
-
   movePositionFlags: CallReducerFlags = 'FullUpdate';
   movePosition(flags: CallReducerFlags) {
     this.movePositionFlags = flags;
@@ -459,6 +468,10 @@ export class RemoteTables {
 
   get botMoveScheduler(): BotMoveSchedulerTableHandle {
     return new BotMoveSchedulerTableHandle(this.connection.clientCache.getOrCreateTable<BotMoveScheduler>(REMOTE_MODULE.tables.bot_move_scheduler));
+  }
+
+  get goBoardHistory(): GoBoardHistoryTableHandle {
+    return new GoBoardHistoryTableHandle(this.connection.clientCache.getOrCreateTable<GoBoardHistory>(REMOTE_MODULE.tables.go_board_history));
   }
 
   get room(): RoomTableHandle {

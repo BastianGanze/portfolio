@@ -33,6 +33,8 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 import { TttBoard as __TttBoard } from "./ttt_board_type";
+import { Connect4 as __Connect4 } from "./connect_4_type";
+import { SpacetimeGoBoard as __SpacetimeGoBoard } from "./spacetime_go_board_type";
 
 // A namespace for generated variants and helper functions.
 export namespace DbBoardGame {
@@ -40,7 +42,8 @@ export namespace DbBoardGame {
   // One type is generated per variant and will be used in the `value` field of
   // the tagged union.
   export type TicTacToe = { tag: "TicTacToe", value: __TttBoard };
-  export type Connect4 = { tag: "Connect4", value: number };
+  export type Connect4 = { tag: "Connect4", value: __Connect4 };
+  export type Go = { tag: "Go", value: __SpacetimeGoBoard };
 
   // Helper functions for constructing each variant of the tagged union.
   // ```
@@ -49,12 +52,14 @@ export namespace DbBoardGame {
   // assert!(foo.value === 42);
   // ```
   export const TicTacToe = (value: __TttBoard): DbBoardGame => ({ tag: "TicTacToe", value });
-  export const Connect4 = (value: number): DbBoardGame => ({ tag: "Connect4", value });
+  export const Connect4 = (value: __Connect4): DbBoardGame => ({ tag: "Connect4", value });
+  export const Go = (value: __SpacetimeGoBoard): DbBoardGame => ({ tag: "Go", value });
 
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createSumType([
       new SumTypeVariant("TicTacToe", __TttBoard.getTypeScriptAlgebraicType()),
-      new SumTypeVariant("Connect4", AlgebraicType.createU8Type()),
+      new SumTypeVariant("Connect4", __Connect4.getTypeScriptAlgebraicType()),
+      new SumTypeVariant("Go", __SpacetimeGoBoard.getTypeScriptAlgebraicType()),
     ]);
   }
 
@@ -69,7 +74,7 @@ export namespace DbBoardGame {
 }
 
 // The tagged union or sum type for the algebraic type `DbBoardGame`.
-export type DbBoardGame = DbBoardGame.TicTacToe | DbBoardGame.Connect4;
+export type DbBoardGame = DbBoardGame.TicTacToe | DbBoardGame.Connect4 | DbBoardGame.Go;
 
 export default DbBoardGame;
 

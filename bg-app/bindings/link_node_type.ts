@@ -32,32 +32,36 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
+import { OptionU16 as __OptionU16 } from "./option_u_16_type";
 
-export type MakeRandomBoardGameMove = {
-  gameInstanceId: number,
+export type LinkNode = {
+  prev: __OptionU16,
+  next: __OptionU16,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace MakeRandomBoardGameMove {
+export namespace LinkNode {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("gameInstanceId", AlgebraicType.createU32Type()),
+      new ProductTypeElement("prev", __OptionU16.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("next", __OptionU16.getTypeScriptAlgebraicType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: MakeRandomBoardGameMove): void {
-    MakeRandomBoardGameMove.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: LinkNode): void {
+    LinkNode.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): MakeRandomBoardGameMove {
-    return MakeRandomBoardGameMove.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): LinkNode {
+    return LinkNode.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }
+
 

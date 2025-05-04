@@ -33,6 +33,7 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 import { Coord as __Coord } from "./coord_type";
+import { Move as __Move } from "./move_type";
 
 // A namespace for generated variants and helper functions.
 export namespace DbBoardGameMove {
@@ -41,6 +42,7 @@ export namespace DbBoardGameMove {
   // the tagged union.
   export type TicTacToe = { tag: "TicTacToe", value: __Coord };
   export type Connect4 = { tag: "Connect4", value: number };
+  export type Go = { tag: "Go", value: __Move };
 
   // Helper functions for constructing each variant of the tagged union.
   // ```
@@ -50,11 +52,13 @@ export namespace DbBoardGameMove {
   // ```
   export const TicTacToe = (value: __Coord): DbBoardGameMove => ({ tag: "TicTacToe", value });
   export const Connect4 = (value: number): DbBoardGameMove => ({ tag: "Connect4", value });
+  export const Go = (value: __Move): DbBoardGameMove => ({ tag: "Go", value });
 
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createSumType([
       new SumTypeVariant("TicTacToe", __Coord.getTypeScriptAlgebraicType()),
       new SumTypeVariant("Connect4", AlgebraicType.createU8Type()),
+      new SumTypeVariant("Go", __Move.getTypeScriptAlgebraicType()),
     ]);
   }
 
@@ -69,7 +73,7 @@ export namespace DbBoardGameMove {
 }
 
 // The tagged union or sum type for the algebraic type `DbBoardGameMove`.
-export type DbBoardGameMove = DbBoardGameMove.TicTacToe | DbBoardGameMove.Connect4;
+export type DbBoardGameMove = DbBoardGameMove.TicTacToe | DbBoardGameMove.Connect4 | DbBoardGameMove.Go;
 
 export default DbBoardGameMove;
 

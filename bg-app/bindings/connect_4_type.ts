@@ -32,37 +32,36 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
-import { Player as __Player } from "./player_type";
 import { Outcome as __Outcome } from "./outcome_type";
 
-export type TttBoard = {
-  tiles: __Player | undefined[],
-  nextPlayer: __Player,
+export type Connect4 = {
+  tilesNext: bigint,
+  tilesOccupied: bigint,
   outcome: __Outcome | undefined,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace TttBoard {
+export namespace Connect4 {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("tiles", AlgebraicType.createArrayType(AlgebraicType.createOptionType(__Player.getTypeScriptAlgebraicType()))),
-      new ProductTypeElement("nextPlayer", __Player.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("tilesNext", AlgebraicType.createU64Type()),
+      new ProductTypeElement("tilesOccupied", AlgebraicType.createU64Type()),
       new ProductTypeElement("outcome", AlgebraicType.createOptionType(__Outcome.getTypeScriptAlgebraicType())),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: TttBoard): void {
-    TttBoard.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: Connect4): void {
+    Connect4.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): TttBoard {
-    return TttBoard.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): Connect4 {
+    return Connect4.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

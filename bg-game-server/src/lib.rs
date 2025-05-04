@@ -5,6 +5,7 @@ use crate::board_games::{DbBoardGameMove, DbBoardGameParam};
 use board_game::ai::mcts::MCTSBot;
 use board_game::ai::Bot;
 use board_game::board::{Board, Outcome, Player};
+use board_game::games::go::{SpacetimeGoBoard, SpacetimeGoHistory};
 use board_games::DbBoardGame;
 use math::DbVector2;
 use spacetimedb::{
@@ -54,11 +55,20 @@ pub struct VersusGameInstance {
     game_state: DbBoardGame,
 }
 
+#[derive(Debug, Clone)]
+#[table(name = go_board_history)]
+pub struct GoBoardHistory {
+    #[primary_key]
+    id: GameInstanceId,
+    history: String,
+}
+
 impl VersusGameInstance {
     pub fn next_player(&self) -> Option<Player> {
         match &self.game_state {
             DbBoardGame::TicTacToe(board) => Some(board.next_player()),
-            DbBoardGame::Connect4(_) => None,
+            DbBoardGame::Connect4(board) => Some(board.next_player()),
+            DbBoardGame::Go(board) => Some(board.next_player()),
         }
     }
 }
@@ -127,6 +137,41 @@ struct BotMoveScheduler {
     game_instance_id: GameInstanceId,
 }
 
+fn get_go_board_history(
+    ctx: &ReducerContext,
+    game_instance_id: GameInstanceId,
+) -> Result<SpacetimeGoHistory, String> {
+    if let Some(board_history) = ctx.db.go_board_history().id().find(game_instance_id) {
+        let history: SpacetimeGoHistory = serde_json::from_str(&board_history.history)
+            .map_err(|e| format!("Failed to deserialize board history: {:?}", e))?;
+        Ok(history)
+    } else {
+        Ok(SpacetimeGoHistory {
+            int_set: Default::default(),
+        })
+    }
+}
+
+fn save_go_board_history(
+    ctx: &ReducerContext,
+    game_instance_id: GameInstanceId,
+    history: SpacetimeGoHistory,
+) {
+    match serde_json::to_string(&history)
+        .map_err(|e| format!("Failed to serialize board history: {:?}", e))
+    {
+        Ok(history_str) => {
+            ctx.db.go_board_history().insert(GoBoardHistory {
+                id: game_instance_id,
+                history: history_str,
+            });
+        }
+        Err(err) => {
+            log::error!("Failed to save board history: {:?}", err);
+        }
+    }
+}
+
 #[reducer]
 fn bot_move(ctx: &ReducerContext, timeout: BotMoveScheduler) {
     if ctx.sender != ctx.identity() {
@@ -140,15 +185,39 @@ fn bot_move(ctx: &ReducerContext, timeout: BotMoveScheduler) {
         .id()
         .find(timeout.game_instance_id)
     {
-        let mut bot = MCTSBot::new(100, 2.0, ctx.rng());
-        if let Ok(mv) = match game_instance.game_state {
+        let iterations_depending_on_game = match game_instance.game_state {
+            DbBoardGame::TicTacToe(_) => 100,
+            DbBoardGame::Connect4(_) => 200,
+            DbBoardGame::Go(_) => 10000,
+        };
+        let mut bot = MCTSBot::new(iterations_depending_on_game, 2.0, ctx.rng());
+        match match game_instance.game_state {
             DbBoardGame::TicTacToe(ref mut board) => bot
                 .select_move(board)
                 .map(DbBoardGameMove::TicTacToe)
                 .map_err(|m| format!("Bot error: {:?}", m)),
-            DbBoardGame::Connect4(_) => Err("Connect4 bot not implemented".to_string()),
+            DbBoardGame::Connect4(ref mut board) => bot
+                .select_move(board)
+                .map(DbBoardGameMove::Connect4)
+                .map_err(|m| format!("Bot error: {:?}", m)),
+            DbBoardGame::Go(ref mut spacetime_board) => {
+                if let Ok(history) = get_go_board_history(ctx, timeout.game_instance_id) {
+                    let board = spacetime_board.clone().into_go_board(history.int_set);
+                    bot.select_move(&board)
+                        .map(DbBoardGameMove::Go)
+                        .map_err(|m| format!("Bot error: {:?}", m))
+                } else {
+                    Err(format!(
+                        "Failed to get Go board history for game instance ID: {}",
+                        timeout.game_instance_id
+                    ))
+                }
+            }
         } {
-            _make_board_game_move(ctx, timeout.game_instance_id, mv, true);
+            Ok(mv) => _make_board_game_move(ctx, timeout.game_instance_id, mv, true),
+            Err(err) => {
+                log::error!("Bot error: {:?}", err);
+            }
         }
     } else {
         log::warn!(
@@ -395,7 +464,43 @@ fn _make_board_game_move(
                     game_instance.next_player = board.next_player();
                 }
             }
-            DbBoardGame::Connect4(_) => {}
+            DbBoardGame::Connect4(ref mut board) => {
+                if let DbBoardGameMove::Connect4(connect4_move) = mv {
+                    match board.play(connect4_move) {
+                        Ok(()) => {}
+                        Err(err) => {
+                            log::error!("Could not make move! {:?}", err);
+                        }
+                    }
+                    game_instance.game_done = board.is_done();
+                    game_instance.outcome = board.outcome();
+                    game_instance.next_player = board.next_player();
+                }
+            }
+            DbBoardGame::Go(ref mut spacetime_board) => {
+                if let DbBoardGameMove::Go(go_move) = mv {
+                    if let Ok(history) = get_go_board_history(ctx, game_instance.id) {
+                        let mut board = spacetime_board.clone().into_go_board(history.int_set);
+                        match board.play(go_move) {
+                            Ok(()) => {}
+                            Err(err) => {
+                                log::error!("Could not make move! {:?}", err);
+                            }
+                        }
+                        game_instance.game_done = board.is_done();
+                        game_instance.outcome = board.outcome();
+                        game_instance.next_player = board.next_player();
+                        save_go_board_history(
+                            ctx,
+                            game_instance.id,
+                            SpacetimeGoHistory {
+                                int_set: board.history().clone(),
+                            },
+                        );
+                        game_instance.game_state = DbBoardGame::Go(SpacetimeGoBoard::from(board));
+                    }
+                }
+            }
         }
         if let (None, Some(outcome)) = (outcome_before_move, game_instance.outcome) {
             calculate_scores(ctx, &game_instance, outcome);
@@ -474,18 +579,6 @@ pub fn make_random_move(ctx: &ReducerContext, board: &mut impl Board) {
         Err(_) => {
             log::error!("Board done, could not make move!");
         }
-    }
-}
-
-#[reducer]
-pub fn make_random_board_game_move(ctx: &ReducerContext, game_instance_id: GameInstanceId) {
-    if let Some(mut game_instance) = ctx.db.versus_game_instance().id().find(game_instance_id) {
-        match game_instance.game_state {
-            DbBoardGame::TicTacToe(ref mut board) => make_random_move(ctx, board),
-            DbBoardGame::Connect4(_) => {}
-        }
-
-        ctx.db.versus_game_instance().id().update(game_instance);
     }
 }
 
@@ -588,7 +681,7 @@ pub fn join_random_game(ctx: &ReducerContext, game_param: DbBoardGameParam) {
         } else {
             game_instance.player_two = Some(ctx.sender);
         }
-        if (game_instance.player_one.is_some() && game_instance.player_two.is_some()) {
+        if game_instance.player_one.is_some() && game_instance.player_two.is_some() {
             game_instance.match_started = true;
         }
         ctx.db.versus_game_instance().id().update(game_instance);

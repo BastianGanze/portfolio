@@ -32,14 +32,16 @@ import {
   Timestamp,
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
+import { Outcome as __Outcome } from "./outcome_type";
+
 // A namespace for generated variants and helper functions.
-export namespace DbBoardGameParam {
+export namespace State {
   // These are the generated variant types for each variant of the tagged union.
   // One type is generated per variant and will be used in the `value` field of
   // the tagged union.
-  export type TicTacToe = { tag: "TicTacToe" };
-  export type Connect4 = { tag: "Connect4" };
-  export type Go = { tag: "Go" };
+  export type Normal = { tag: "Normal" };
+  export type Passed = { tag: "Passed" };
+  export type Done = { tag: "Done", value: __Outcome };
 
   // Helper functions for constructing each variant of the tagged union.
   // ```
@@ -47,30 +49,30 @@ export namespace DbBoardGameParam {
   // assert!(foo.tag === "A");
   // assert!(foo.value === 42);
   // ```
-  export const TicTacToe = { tag: "TicTacToe" };
-  export const Connect4 = { tag: "Connect4" };
-  export const Go = { tag: "Go" };
+  export const Normal = { tag: "Normal" };
+  export const Passed = { tag: "Passed" };
+  export const Done = (value: __Outcome): State => ({ tag: "Done", value });
 
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createSumType([
-      new SumTypeVariant("TicTacToe", AlgebraicType.createProductType([])),
-      new SumTypeVariant("Connect4", AlgebraicType.createProductType([])),
-      new SumTypeVariant("Go", AlgebraicType.createProductType([])),
+      new SumTypeVariant("Normal", AlgebraicType.createProductType([])),
+      new SumTypeVariant("Passed", AlgebraicType.createProductType([])),
+      new SumTypeVariant("Done", __Outcome.getTypeScriptAlgebraicType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: DbBoardGameParam): void {
-      DbBoardGameParam.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: State): void {
+      State.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): DbBoardGameParam {
-      return DbBoardGameParam.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): State {
+      return State.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }
 
-// The tagged union or sum type for the algebraic type `DbBoardGameParam`.
-export type DbBoardGameParam = DbBoardGameParam.TicTacToe | DbBoardGameParam.Connect4 | DbBoardGameParam.Go;
+// The tagged union or sum type for the algebraic type `State`.
+export type State = State.Normal | State.Passed | State.Done;
 
-export default DbBoardGameParam;
+export default State;
 

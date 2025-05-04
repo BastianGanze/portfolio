@@ -41,7 +41,7 @@ export const useGameStore = defineStore('gameStore', () => {
   }
   let joinRandomGame = (_gameParam: DbBoardGameParam) => {
   }
-  let makeRandomBoardGameMove = (_instanceId: number) => {
+  const makeRandomBoardGameMove = (_instanceId: number) => {
   }
   let makeBoardGameMove = (_instanceId: number, _boardGameMove: DbBoardGameMove) => {
   }
@@ -183,12 +183,6 @@ export const useGameStore = defineStore('gameStore', () => {
       joinRandomGame = (gameParam: DbBoardGameParam) => {
         connected.promise.then(() => {
           dbConn!.reducers.joinRandomGame(gameParam)
-        })
-      }
-
-      makeRandomBoardGameMove = (instanceId: number) => {
-        connected.promise.then(() => {
-          dbConn!.reducers.makeRandomBoardGameMove(instanceId)
         })
       }
 

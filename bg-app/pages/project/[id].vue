@@ -8,6 +8,8 @@ const route = useRoute()
 const { currentUserId, gameInstances } = storeToRefs(useGameStore())
 const possibleGames: DbBoardGameParam[] = [
   { tag: 'TicTacToe' },
+  { tag: 'Connect4' },
+  { tag: 'Go' },
 ]
 
 const { data } = await useAsyncQuery({

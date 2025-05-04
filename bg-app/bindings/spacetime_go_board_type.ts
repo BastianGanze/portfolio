@@ -33,36 +33,43 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 import { Player as __Player } from "./player_type";
-import { Outcome as __Outcome } from "./outcome_type";
+import { Rules as __Rules } from "./rules_type";
+import { Chains as __Chains } from "./chains_type";
+import { State as __State } from "./state_type";
+import { Komi as __Komi } from "./komi_type";
 
-export type TttBoard = {
-  tiles: __Player | undefined[],
+export type SpacetimeGoBoard = {
+  rules: __Rules,
+  chains: __Chains,
   nextPlayer: __Player,
-  outcome: __Outcome | undefined,
+  state: __State,
+  komi: __Komi,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace TttBoard {
+export namespace SpacetimeGoBoard {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("tiles", AlgebraicType.createArrayType(AlgebraicType.createOptionType(__Player.getTypeScriptAlgebraicType()))),
+      new ProductTypeElement("rules", __Rules.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("chains", __Chains.getTypeScriptAlgebraicType()),
       new ProductTypeElement("nextPlayer", __Player.getTypeScriptAlgebraicType()),
-      new ProductTypeElement("outcome", AlgebraicType.createOptionType(__Outcome.getTypeScriptAlgebraicType())),
+      new ProductTypeElement("state", __State.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("komi", __Komi.getTypeScriptAlgebraicType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: TttBoard): void {
-    TttBoard.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: SpacetimeGoBoard): void {
+    SpacetimeGoBoard.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): TttBoard {
-    return TttBoard.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): SpacetimeGoBoard {
+    return SpacetimeGoBoard.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }

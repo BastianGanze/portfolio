@@ -33,36 +33,42 @@ import {
   deepEqual,
 } from "@clockworklabs/spacetimedb-sdk";
 import { Player as __Player } from "./player_type";
-import { Outcome as __Outcome } from "./outcome_type";
+import { LinkNode as __LinkNode } from "./link_node_type";
+import { Zobrist as __Zobrist } from "./zobrist_type";
+import { LinkHead as __LinkHead } from "./link_head_type";
 
-export type TttBoard = {
-  tiles: __Player | undefined[],
-  nextPlayer: __Player,
-  outcome: __Outcome | undefined,
+export type Group = {
+  color: __Player,
+  libertyEdgeCount: number,
+  zobrist: __Zobrist,
+  stones: __LinkHead,
+  deadLink: __LinkNode,
 };
 
 /**
  * A namespace for generated helper functions.
  */
-export namespace TttBoard {
+export namespace Group {
   /**
   * A function which returns this type represented as an AlgebraicType.
   * This function is derived from the AlgebraicType used to generate this type.
   */
   export function getTypeScriptAlgebraicType(): AlgebraicType {
     return AlgebraicType.createProductType([
-      new ProductTypeElement("tiles", AlgebraicType.createArrayType(AlgebraicType.createOptionType(__Player.getTypeScriptAlgebraicType()))),
-      new ProductTypeElement("nextPlayer", __Player.getTypeScriptAlgebraicType()),
-      new ProductTypeElement("outcome", AlgebraicType.createOptionType(__Outcome.getTypeScriptAlgebraicType())),
+      new ProductTypeElement("color", __Player.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("libertyEdgeCount", AlgebraicType.createU16Type()),
+      new ProductTypeElement("zobrist", __Zobrist.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("stones", __LinkHead.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("deadLink", __LinkNode.getTypeScriptAlgebraicType()),
     ]);
   }
 
-  export function serialize(writer: BinaryWriter, value: TttBoard): void {
-    TttBoard.getTypeScriptAlgebraicType().serialize(writer, value);
+  export function serialize(writer: BinaryWriter, value: Group): void {
+    Group.getTypeScriptAlgebraicType().serialize(writer, value);
   }
 
-  export function deserialize(reader: BinaryReader): TttBoard {
-    return TttBoard.getTypeScriptAlgebraicType().deserialize(reader);
+  export function deserialize(reader: BinaryReader): Group {
+    return Group.getTypeScriptAlgebraicType().deserialize(reader);
   }
 
 }
