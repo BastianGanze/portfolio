@@ -177,12 +177,16 @@ const goBoard = computed(() => {
         </div>
         <div class="go-score mt-2">
           <div class="text-sm">
-            <span class="text-primary">{{
+            <span
+              :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
+            >{{
               t(currentUserPlayerTag === 'A' ? 'yourScoreLabel' : 'opponentScoreLabel')
             }}</span> <span>{{ instance.gameState.value.score.a }}</span>
           </div>
           <div class="text-sm">
-            <span class="text-secondary">{{
+            <span
+              :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
+            >{{
               t(currentUserPlayerTag === 'B' ? 'yourScoreLabel' : 'opponentScoreLabel')
             }}</span> <span>{{ instance.gameState.value.score.b }} + {{
               instance.gameState.value.komi.komi2
