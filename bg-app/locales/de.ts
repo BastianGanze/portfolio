@@ -33,4 +33,8 @@ export const de = {
     one: '1 Spieler im Raum',
     other: '%{count} Spieler im Raum',
   },
+  goPassLabel: 'Pass an den Gegner',
+  goPassGameEndPassLabel: 'Spiel mit Pass beenden',
+  yourScoreLabel: 'Dein Score:',
+  opponentScoreLabel: 'Gegner\'s Score:',
 } satisfies typeof en

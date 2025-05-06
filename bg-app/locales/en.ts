@@ -31,4 +31,8 @@ export const en = {
     one: '1 player inside',
     other: '%{count} players inside',
   },
+  goPassLabel: 'Pass to opponent',
+  goPassGameEndPassLabel: 'End game with pass',
+  yourScoreLabel: 'Your Score:',
+  opponentScoreLabel: 'Opponent\'s Score:',
 }

@@ -112,6 +112,8 @@ import { Room } from "./room_type.ts";
 export { Room };
 import { Rules } from "./rules_type.ts";
 export { Rules };
+import { Score } from "./score_type.ts";
+export { Score };
 import { SpacetimeGoBoard } from "./spacetime_go_board_type.ts";
 export { SpacetimeGoBoard };
 import { State } from "./state_type.ts";

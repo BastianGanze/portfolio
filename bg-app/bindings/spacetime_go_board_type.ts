@@ -37,6 +37,7 @@ import { Rules as __Rules } from "./rules_type";
 import { Chains as __Chains } from "./chains_type";
 import { State as __State } from "./state_type";
 import { Komi as __Komi } from "./komi_type";
+import { Score as __Score } from "./score_type";
 
 export type SpacetimeGoBoard = {
   rules: __Rules,
@@ -44,6 +45,7 @@ export type SpacetimeGoBoard = {
   nextPlayer: __Player,
   state: __State,
   komi: __Komi,
+  score: __Score,
 };
 
 /**
@@ -61,6 +63,7 @@ export namespace SpacetimeGoBoard {
       new ProductTypeElement("nextPlayer", __Player.getTypeScriptAlgebraicType()),
       new ProductTypeElement("state", __State.getTypeScriptAlgebraicType()),
       new ProductTypeElement("komi", __Komi.getTypeScriptAlgebraicType()),
+      new ProductTypeElement("score", __Score.getTypeScriptAlgebraicType()),
     ]);
   }
 

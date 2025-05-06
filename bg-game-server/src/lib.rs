@@ -146,9 +146,15 @@ fn get_go_board_history(
             .map_err(|e| format!("Failed to deserialize board history: {:?}", e))?;
         Ok(history)
     } else {
-        Ok(SpacetimeGoHistory {
+        let new_history = SpacetimeGoHistory {
             int_set: Default::default(),
-        })
+        };
+        ctx.db.go_board_history().insert(GoBoardHistory {
+            id: game_instance_id,
+            history: serde_json::to_string(&new_history)
+                .map_err(|e| format!("Failed to serialize new board history: {:?}", e))?,
+        });
+        Ok(new_history)
     }
 }
 
@@ -161,7 +167,7 @@ fn save_go_board_history(
         .map_err(|e| format!("Failed to serialize board history: {:?}", e))
     {
         Ok(history_str) => {
-            ctx.db.go_board_history().insert(GoBoardHistory {
+            ctx.db.go_board_history().id().update(GoBoardHistory {
                 id: game_instance_id,
                 history: history_str,
             });
@@ -188,7 +194,7 @@ fn bot_move(ctx: &ReducerContext, timeout: BotMoveScheduler) {
         let iterations_depending_on_game = match game_instance.game_state {
             DbBoardGame::TicTacToe(_) => 100,
             DbBoardGame::Connect4(_) => 200,
-            DbBoardGame::Go(_) => 10000,
+            DbBoardGame::Go(_) => 3000,
         };
         let mut bot = MCTSBot::new(iterations_depending_on_game, 2.0, ctx.rng());
         match match game_instance.game_state {

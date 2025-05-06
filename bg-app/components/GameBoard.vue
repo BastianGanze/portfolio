@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Connect4, VersusGameInstance } from '~/bindings'
+import type { VersusGameInstance } from '~/bindings'
 import { match } from 'ts-pattern'
 import { Player } from '~/bindings'
 import { useGameStore } from '~/stores/gameStore'
@@ -7,6 +7,7 @@ import { useGameStore } from '~/stores/gameStore'
 const props = defineProps<{ instance: VersusGameInstance, currentUserId: string }>()
 const { instance, currentUserId } = toRefs(props)
 const { makeBoardGameMove } = useGameStore()
+const { t } = useLocalizationStore()
 
 function ticTacToeMove(index: number) {
   if (!instance.value.matchStarted) {
@@ -22,6 +23,20 @@ function connect4Move(index: number) {
   makeBoardGameMove(instance.value.id, { tag: 'Connect4', value: index })
 }
 
+function goMovePlace(col: number, row: number) {
+  if (!instance.value.matchStarted) {
+    return
+  }
+  makeBoardGameMove(instance.value.id, { tag: 'Go', value: { tag: 'Place', value: { x: col, y: row } } })
+}
+
+function goMovePass() {
+  if (!instance.value.matchStarted) {
+    return
+  }
+  makeBoardGameMove(instance.value.id, { tag: 'Go', value: { tag: 'Pass' } })
+}
+
 const currentUserPlayerTag = computed(() => {
   if (instance.value.playerOne?.toHexString() === currentUserId.value) {
     return Player.A.tag
@@ -32,7 +47,7 @@ const currentUserPlayerTag = computed(() => {
   return null
 })
 
-type LocalConnect4Board = (Player | null)[][]
+type RenderBoard = (Player | null)[][]
 const connect4Width = 7
 const connect4Height = 6
 const connect4Board = computed(() => {
@@ -60,7 +75,7 @@ const connect4Board = computed(() => {
           })
           .exhaustive()
       })
-    }) as LocalConnect4Board
+    }) as RenderBoard
   }
   return null
 })
@@ -73,28 +88,20 @@ function get(tiles: bigint, col: bigint, row: bigint): boolean {
   return (tiles & mask(col, row)) !== 0n
 }
 
-function printConnect4Board(board: Connect4) {
-  const [tilesA, tilesB] = match(currentUserPlayerTag.value)
-    .with('A', () => [board.tilesNext, board.tilesNext ^ board.tilesOccupied])
-    .with('B', () => [board.tilesNext ^ board.tilesOccupied, board.tilesNext])
-    .otherwise(() => [0n, 0n])
-  let output = ''
-  for (let row = BigInt(connect4Height); row >= 0; row--) {
-    for (let col = 0n; col < connect4Width; col++) {
-      output += match([get(tilesA, col, row), get(tilesB, col, row)])
-        .with([true, false], () => 'a')
-        .with([false, true], () => 'b')
-        .with([false, false], () => '.')
-        .with([true, true], () => {
-          console.error('Both players have a tile in the same position')
-          return 'x'
-        })
-        .exhaustive()
-    }
-    output += '\n'
+const goBoardsize = 9
+const goBoard = computed(() => {
+  if (instance.value.gameState.tag === 'Go') {
+    const chains = instance.value.gameState.value.chains
+    return Array.from(Array.from({ length: goBoardsize }), (_, i) => Array.from({ length: goBoardsize }).map((_, j) => {
+      const tileIdx = i * goBoardsize + j
+      const tile = chains.tiles[tileIdx]
+      const groupIdx = tile.groupId.value
+      const group = chains.groups[groupIdx]
+      return group ? (group.color.tag === 'A' ? Player.A : Player.B) : null
+    })) as RenderBoard
   }
-  console.log(output)
-}
+  return null
+})
 </script>
 
 <template>
@@ -111,8 +118,8 @@ function printConnect4Board(board: Connect4) {
           :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
           @click="() => !player && ticTacToeMove(i)"
         >
-          <SvgCrossPreventAnimationCaching v-if="player?.tag === 'A'" />
-          <SvgCirclePreventAnimationCaching v-else-if="player?.tag === 'B'" />
+          <SvgCircleFullPreventAnimationCaching v-if="player?.tag === 'A'" />
+          <SvgCircleFullPreventAnimationCaching v-else-if="player?.tag === 'B'" />
         </div>
       </div>
     </div>
@@ -135,8 +142,55 @@ function printConnect4Board(board: Connect4) {
             class="connect-4-grid-cell"
             :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
           >
-            <SvgCrossPreventAnimationCaching v-if="player?.tag === 'A'" />
+            <SvgCirclePreventAnimationCaching v-if="player?.tag === 'A'" />
             <SvgCirclePreventAnimationCaching v-else-if="player?.tag === 'B'" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="instance.gameState.tag === 'Go' && goBoard" class="flex flex-wrap">
+      <div class="go-grid-bg" />
+      <div class="go-grid">
+        <div
+          v-for="(row, i) in goBoard" :key="i" class="go-grid-row"
+        >
+          <div
+            v-for="(player, j) in row"
+            :key="`${i}-${j}`"
+            class="go-grid-cell"
+            :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
+            @click="() => goMovePlace(j, i)"
+          >
+            <SvgCircleFullPreventAnimationCaching v-if="player?.tag === 'A'" />
+            <SvgCircleFullPreventAnimationCaching v-else-if="player?.tag === 'B'" />
+          </div>
+        </div>
+      </div>
+      <div class="go-info flex flex-wrap flex-col justify-end p-4">
+        <div class="go-pass">
+          <span class="btn btn-accent" @click="goMovePass">{{
+            t(instance.gameState.value
+              .state.tag === 'Passed' ? 'goPassGameEndPassLabel' : 'goPassLabel')
+          }} <Icon
+            name="line-md:arrow-right"
+          /></span>
+        </div>
+        <div class="go-score mt-2">
+          <div class="text-sm">
+            <span class="text-primary">{{
+              t(currentUserPlayerTag === 'A' ? 'yourScoreLabel' : 'opponentScoreLabel')
+            }}</span> <span>{{ instance.gameState.value.score.a }}</span>
+          </div>
+          <div class="text-sm">
+            <span class="text-secondary">{{
+              t(currentUserPlayerTag === 'B' ? 'yourScoreLabel' : 'opponentScoreLabel')
+            }}</span> <span>{{ instance.gameState.value.score.b }} + {{
+              instance.gameState.value.komi.komi2
+            }} (<a
+              class="link link-info" href="https://en.wikipedia.org/wiki/Komi_(Go)"
+              target="_blank"
+              aria-label="Link to Komi explanation"
+            >Komi</a>)</span>
           </div>
         </div>
       </div>
@@ -145,6 +199,41 @@ function printConnect4Board(board: Connect4) {
 </template>
 
 <style scoped>
+.go {
+  position: relative;
+}
+
+.go-grid-bg {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  width: 193px;
+  height: 193px;
+  background-size: 24px 24px;
+  background-image: linear-gradient(to right, var(--color-base-200) 1px, transparent 1px),
+  linear-gradient(to bottom, var(--color-base-200) 1px, transparent 1px);
+}
+
+.go-grid {
+  position: relative;
+  width: 216px;
+  height: 216px;
+}
+
+.go-grid-row {
+  display: flex;
+}
+
+.go-grid-cell {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  box-sizing: content-box;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
 .connect-4 {
   width: 200px;
   height: 200px;
