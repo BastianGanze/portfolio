@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import type { Project } from '~/__generated__/graphql'
+import type {
+  Project,
+  Project_UnlockContent_Document,
+  Project_UnlockContentGerman_Document,
+} from '~/__generated__/graphql'
 import type { DbBoardGameParam } from '~/bindings'
-import { GET_PROJECTS } from '~/queries'
+import { GET_PROJECT_RESTRICTED, GET_PROJECTS } from '~/queries'
 import { useGameStore } from '~/stores/gameStore'
 
 const route = useRoute()
-const { currentUserId, gameInstances } = storeToRefs(useGameStore())
+const { currentUserId, users, gameInstances } = storeToRefs(useGameStore())
 const possibleGames: DbBoardGameParam[] = [
   { tag: 'TicTacToe' },
   { tag: 'Connect4' },
@@ -26,6 +30,7 @@ type LocalProjectType = Omit<Project, 'mainImage'> & {
   mainImage: { url: string } | null
 }
 const { locale } = storeToRefs(useLocalizationStore())
+const { t } = useLocalizationStore()
 const project = computed(() => {
   if (!data.value?.projects || data.value.projects.length !== 1) {
     return null
@@ -45,6 +50,61 @@ const project = computed(() => {
 })
 
 const gameToPlay = computed(() => possibleGames.find(game => game.tag === project.value?.game) ?? null)
+
+interface RestrictedContent {
+  content: Project_UnlockContent_Document
+  contentGerman: Project_UnlockContentGerman_Document
+}
+
+const restrictedContent = ref<RestrictedContent | null>(null)
+const restrictedDocument = computed(() => {
+  if (!restrictedContent.value) {
+    return null
+  }
+  return locale.value === 'en' ? restrictedContent.value.content.document : restrictedContent.value.contentGerman.document
+})
+const restrictedDocumentsLoading = ref<boolean>(false)
+
+const restrictedRequirementsFullfilled = computed(() => {
+  if (!project.value || !currentUserId.value || !users.value) {
+    return false
+  }
+  const player = users.value[currentUserId.value]
+  if (!player) {
+    return false
+  }
+  const gamesWon = player.gameScores.find(game => game.game.tag === gameToPlay.value?.tag)?.won || 0
+  return gamesWon > 0
+})
+watch(restrictedRequirementsFullfilled, () => {
+  if (!restrictedContent.value && restrictedRequirementsFullfilled.value && !restrictedDocumentsLoading.value) {
+    loadRestrictedContent()
+  }
+}, { immediate: true })
+
+async function loadRestrictedContent() {
+  restrictedDocumentsLoading.value = true
+  const { data: restrictedContentData } = await useAsyncQuery({
+    query: GET_PROJECT_RESTRICTED,
+    variables: {
+      where: {
+        roomId: {
+          equals: Number(route.params.id),
+        },
+      },
+    },
+  })
+  const project = restrictedContentData.value?.projects?.[0]
+  if (!project || !project.unlockContent || !project.unlockContentGerman) {
+    return null
+  }
+
+  restrictedContent.value = {
+    content: project.unlockContent,
+    contentGerman: project.unlockContentGerman,
+  }
+  restrictedDocumentsLoading.value = false
+}
 </script>
 
 <template>
@@ -65,6 +125,24 @@ const gameToPlay = computed(() => possibleGames.find(game => game.tag === projec
           </h2>
           <RichText :document="project.content" />
         </article>
+        <div v-if="currentUserId && gameToPlay" class="card mt-10">
+          <div v-if="restrictedDocument" class="card-title alert alert-success">
+            <Icon name="line-md:check-all" />
+            {{ t('restrictedAreaLabel') }}
+          </div>
+          <div v-else class="card-title alert alert-warning">
+            <Icon name="line-md:alert-loop" />
+            {{ t('restrictedAreaLabel') }}
+          </div>
+          <div class="card-body">
+            <article v-if="restrictedDocument" class="prose max-w-none">
+              <RichText :document="restrictedDocument" />
+            </article>
+            <div v-else>
+              {{ t('restrictedAreaExplanationText', { game: gameToPlay.tag }) }}
+            </div>
+          </div>
+        </div>
         <GameBoardManager
           v-if="currentUserId && gameToPlay"
           class="mt-5"

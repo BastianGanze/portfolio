@@ -37,4 +37,6 @@ export const de = {
   goPassGameEndPassLabel: 'Spiel mit Pass beenden',
   yourScoreLabel: 'Dein Score:',
   opponentScoreLabel: 'Gegner\'s Score:',
+  restrictedAreaLabel: 'Eingeschränkter Bereich',
+  restrictedAreaExplanationText: `Gewinne ein Spiel %{game}, um Zugriff zu erhalten.`,
 } satisfies typeof en

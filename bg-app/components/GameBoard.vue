@@ -109,7 +109,7 @@ const goBoard = computed(() => {
     <div v-if="instance.gameState.tag === 'TicTacToe'" class="tic-tac-toe-board">
       <div class="tic-tac-toe-bg-grid masked-overflow">
         <div
-          v-for="(player, i) in instance.gameState.value.tiles" :key="i" class="tic-tac-toe-bg-grid-cell"
+          v-for="(_, i) in instance.gameState.value.tiles" :key="i" class="tic-tac-toe-bg-grid-cell"
         />
       </div>
       <div class="tic-tac-toe-grid">
@@ -118,8 +118,8 @@ const goBoard = computed(() => {
           :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
           @click="() => !player && ticTacToeMove(i)"
         >
-          <SvgCircleFullPreventAnimationCaching v-if="player?.tag === 'A'" />
-          <SvgCircleFullPreventAnimationCaching v-else-if="player?.tag === 'B'" />
+          <SvgCirclePreventAnimationCaching v-if="player?.tag === 'A'" />
+          <SvgCrossPreventAnimationCaching v-else-if="player?.tag === 'B'" />
         </div>
       </div>
     </div>
@@ -142,8 +142,8 @@ const goBoard = computed(() => {
             class="connect-4-grid-cell"
             :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
           >
-            <SvgCirclePreventAnimationCaching v-if="player?.tag === 'A'" />
-            <SvgCirclePreventAnimationCaching v-else-if="player?.tag === 'B'" />
+            <SvgCircleFullPreventAnimationCaching v-if="player?.tag === 'A'" />
+            <SvgCircleFullPreventAnimationCaching v-else-if="player?.tag === 'B'" />
           </div>
         </div>
       </div>
@@ -206,10 +206,6 @@ const goBoard = computed(() => {
 </template>
 
 <style scoped>
-.go {
-  position: relative;
-}
-
 .go-grid-bg {
   position: absolute;
   left: 12px;

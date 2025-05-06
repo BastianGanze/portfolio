@@ -66,3 +66,16 @@ export const GET_PROJECTS = gql(/* GraphQL */`
         }
     }
 `)
+
+export const GET_PROJECT_RESTRICTED = gql(/* GraphQL */`
+    query getProjectRestricted($where: ProjectWhereInput!) {
+        projects(where: $where) {
+            unlockContent {
+                document
+            }
+            unlockContentGerman {
+                document
+            }
+        }
+    }
+`)

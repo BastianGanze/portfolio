@@ -35,4 +35,6 @@ export const en = {
   goPassGameEndPassLabel: 'End game with pass',
   yourScoreLabel: 'Your Score:',
   opponentScoreLabel: 'Opponent\'s Score:',
+  restrictedAreaLabel: 'Restricted Area',
+  restrictedAreaExplanationText: `No access. Win a game of %{game} to unlock.`,
 }
