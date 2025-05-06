@@ -168,7 +168,10 @@ const goBoard = computed(() => {
       </div>
       <div class="go-info flex flex-wrap flex-col justify-end p-4">
         <div class="go-pass">
-          <span class="btn btn-accent" @click="goMovePass">{{
+          <span
+            class="btn btn-accent" :class="{ 'btn-disabled': instance.nextPlayer.tag !== currentUserPlayerTag }"
+            @click="goMovePass"
+          >{{
             t(instance.gameState.value
               .state.tag === 'Passed' ? 'goPassGameEndPassLabel' : 'goPassLabel')
           }} <Icon
@@ -178,14 +181,14 @@ const goBoard = computed(() => {
         <div class="go-score mt-2">
           <div class="text-sm">
             <span
-              :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
+              :class="{ 'text-primary': currentUserPlayerTag === 'A', 'text-secondary': currentUserPlayerTag !== 'A' }"
             >{{
               t(currentUserPlayerTag === 'A' ? 'yourScoreLabel' : 'opponentScoreLabel')
             }}</span> <span>{{ instance.gameState.value.score.a }}</span>
           </div>
           <div class="text-sm">
             <span
-              :class="{ 'text-primary': player?.tag && currentUserPlayerTag === player.tag, 'text-secondary': player?.tag && currentUserPlayerTag !== player.tag }"
+              :class="{ 'text-primary': currentUserPlayerTag === 'B', 'text-secondary': currentUserPlayerTag !== 'B' }"
             >{{
               t(currentUserPlayerTag === 'B' ? 'yourScoreLabel' : 'opponentScoreLabel')
             }}</span> <span>{{ instance.gameState.value.score.b }} + {{
