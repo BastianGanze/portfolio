@@ -16,7 +16,7 @@ export const de = {
   underConstruction: 'In Arbeit',
   projectGetMoreInfoLink: 'Mehr Infos …',
   gameBoardNoGameActive: 'Kein aktives Spiel',
-  gameBoardWaitingForOpponent: 'Warten auf den Gegner …',
+  gameBoardWaitingForOpponent: 'Warte auf einen Gegner …',
   gameBoardYourTurn: 'Dein Zug',
   gameBoardOpponentTurn: 'Zug des Gegners',
   gameBoardPlayAgainstBotButton: 'Gegen Bot spielen',

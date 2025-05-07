@@ -14,7 +14,7 @@ export const en = {
   underConstruction: 'Under Construction',
   projectGetMoreInfoLink: 'More information …',
   gameBoardNoGameActive: 'No game active',
-  gameBoardWaitingForOpponent: 'Waiting for opponent …',
+  gameBoardWaitingForOpponent: 'Waiting for an opponent …',
   gameBoardYourTurn: 'Your turn',
   gameBoardOpponentTurn: 'Opponent\'s turn',
   gameBoardPlayAgainstBotButton: 'Play against bot',
